@@ -17,9 +17,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [accent, setAccent] = useState<AccentColor>('purple')
 
   useEffect(() => {
-    const root = document.documentElement
-    root.classList.remove('light', 'dark')
-    root.classList.add(mode)
+    if (typeof document === 'undefined') return
+
+    const rafId = window.requestAnimationFrame(() => {
+      const root = document.documentElement
+      root.classList.remove('light', 'dark')
+      root.classList.add(mode)
+    })
+
+    return () => {
+      window.cancelAnimationFrame(rafId)
+    }
   }, [mode])
 
   return (
