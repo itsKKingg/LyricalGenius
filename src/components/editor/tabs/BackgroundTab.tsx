@@ -1,10 +1,11 @@
 import { useProjectStore } from '../../../stores/projectStore'
+import type { ProjectSettings } from '../../../types'
 
 const BACKGROUND_TYPES = [
-  { value: 'gradient', label: 'Gradient' },
-  { value: 'image', label: 'Image' },
-  { value: 'albumArt', label: 'Album Art' },
-  { value: 'visualizer', label: 'Visualizer' },
+  { value: 'gradient' as const, label: 'Gradient' },
+  { value: 'image' as const, label: 'Image' },
+  { value: 'albumArt' as const, label: 'Album Art' },
+  { value: 'visualizer' as const, label: 'Visualizer' },
 ]
 
 const GRADIENT_PRESETS = [
@@ -32,7 +33,7 @@ export default function BackgroundTab() {
           {BACKGROUND_TYPES.map(type => (
             <button
               key={type.value}
-              onClick={() => updateSettings({ backgroundType: type.value as any })}
+              onClick={() => updateSettings({ backgroundType: type.value as ProjectSettings['backgroundType'] })}
               className={`
                 px-3 py-2 rounded-lg border transition-colors text-sm
                 ${settings.backgroundType === type.value

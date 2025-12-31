@@ -88,7 +88,7 @@ export default function TextTab() {
           {POSITIONS.map(pos => (
             <button
               key={pos.value}
-              onClick={() => updateSettings({ captionPosition: pos.value as any })}
+              onClick={() => updateSettings({ captionPosition: pos.value as 'top' | 'center' | 'bottom' })}
               className={`
                 px-3 py-2 rounded-lg border transition-colors text-sm
                 ${settings.captionPosition === pos.value
@@ -109,7 +109,7 @@ export default function TextTab() {
           {ALIGNMENTS.map(align => (
             <button
               key={align.value}
-              onClick={() => updateSettings({ textAlign: align.value as any })}
+              onClick={() => updateSettings({ textAlign: align.value as 'left' | 'center' | 'right' })}
               className={`
                 px-3 py-2 rounded-lg border transition-colors text-sm
                 ${settings.textAlign === align.value
