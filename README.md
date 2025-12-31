@@ -79,7 +79,16 @@ npm run build
 npm run preview
 ```
 
-The built files will be in the `dist/` directory, ready to deploy to any static hosting service (Vercel, Netlify, GitHub Pages, etc.).
+The built files will be in the `dist/` directory, ready to deploy to any static hosting service.
+
+### Deploying to Cloudflare
+
+```bash
+# Deploy to Cloudflare Pages
+npm run deploy:cloudflare
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions for Vercel, Netlify, GitHub Pages, and more.
 
 ---
 
