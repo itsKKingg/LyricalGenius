@@ -88,6 +88,7 @@ export default function VideoPreview() {
           project={currentProject}
           currentTime={currentTime}
           audioPlayer={audioPlayerRef.current}
+          isPlaying={isPlaying}
         />
 
         {/* Play/Pause Overlay */}

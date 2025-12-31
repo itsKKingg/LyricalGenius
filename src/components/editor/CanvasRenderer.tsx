@@ -8,10 +8,11 @@ interface CanvasRendererProps {
   project: Project
   currentTime: number
   audioPlayer: AudioPlayer | null
+  isPlaying: boolean
 }
 
 const CanvasRenderer = forwardRef<HTMLCanvasElement, CanvasRendererProps>(
-  ({ width, height, project, currentTime, audioPlayer }, ref) => {
+  ({ width, height, project, currentTime, audioPlayer, isPlaying }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const animationFrameRef = useRef<number>()
 
@@ -41,14 +42,25 @@ const CanvasRenderer = forwardRef<HTMLCanvasElement, CanvasRendererProps>(
         animationFrameRef.current = requestAnimationFrame(render)
       }
 
-      render()
+      // Only start animation loop if audio player exists and is playing
+      if (audioPlayer && isPlaying) {
+        render()
+      } else {
+        // Render once without animation loop
+        ctx.clearRect(0, 0, width, height)
+        renderBackground(ctx, width, height, project, audioPlayer)
+        renderLyrics(ctx, width, height, project, currentTime)
+        if (project.settings.watermarkEnabled) {
+          renderWatermark(ctx, width, height, project)
+        }
+      }
 
       return () => {
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current)
         }
       }
-    }, [width, height, project, currentTime, audioPlayer])
+    }, [width, height, project, currentTime, audioPlayer, isPlaying])
 
     return (
       <canvas
