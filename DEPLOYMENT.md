@@ -97,6 +97,26 @@ Then enable GitHub Pages in repository settings and set the source to the `gh-pa
 
 ## Cloudflare Pages
 
+### Via Wrangler CLI (Recommended)
+
+```bash
+# Install Wrangler CLI (if not already installed)
+npm install -g wrangler
+
+# Deploy to Cloudflare Pages
+npm run deploy:cloudflare
+
+# Or test deployment without publishing
+npm run deploy:dry-run
+```
+
+The project includes a `wrangler.jsonc` configuration file that handles:
+- Static asset deployment from the `dist/` directory
+- SPA routing (all routes redirect to `index.html`)
+- Automatic compatibility with Cloudflare Pages
+
+### Via Cloudflare Dashboard
+
 1. Push your code to GitHub
 2. Visit [pages.cloudflare.com](https://pages.cloudflare.com)
 3. Click "Create a project"

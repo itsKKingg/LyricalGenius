@@ -1,0 +1,8 @@
+{
+  // Cloudflare Workers/Pages configuration for LyricalGenius
+  "name": "lyricalgenius",
+  "compatibility_date": "2025-12-31",
+  "assets": {
+    "directory": "./dist"
+  }
+}
