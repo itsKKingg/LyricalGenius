@@ -131,31 +131,35 @@ export function getAnimationCSS(style: AnimationStyle, progress: number): React.
       }
       break;
 
-    case 'word-bounce':
+    case 'word-bounce': {
       const bounceProgress = Math.sin(progress * Math.PI);
       styles.transform = `translateY(${-20 * bounceProgress}px)`;
       break;
+    }
 
-    case 'neon-glow':
+    case 'neon-glow': {
       const glowIntensity = 0.5 + Math.sin(progress * Math.PI * 2) * 0.5;
       styles.textShadow = `0 0 ${20 * glowIntensity}px #00ffff, 0 0 ${40 * glowIntensity}px #00ffff`;
       break;
+    }
 
     case 'typewriter':
       styles.clipPath = `inset(0 ${100 - progress * 100}% 0 0)`;
       break;
 
-    case 'blur-fade':
+    case 'blur-fade': {
       if (progress < 0.5) {
         styles.filter = `blur(${10 * (1 - progress / 0.5)}px)`;
         styles.opacity = progress / 0.5;
       }
       break;
+    }
 
-    case 'scale-pulse':
+    case 'scale-pulse': {
       const pulse = 1 + Math.sin(progress * Math.PI * 4) * 0.1;
       styles.transform = `scale(${pulse})`;
       break;
+    }
 
     case 'flip-3d':
       if (progress < 0.5) {
@@ -175,10 +179,11 @@ export function getAnimationCSS(style: AnimationStyle, progress: number): React.
       }
       break;
 
-    case 'rainbow-cycle':
+    case 'rainbow-cycle': {
       const hue = (progress * 360) % 360;
       styles.color = `hsl(${hue}, 100%, 50%)`;
       break;
+    }
 
     case 'bold-entrance':
       if (progress < 0.3) {
@@ -187,12 +192,13 @@ export function getAnimationCSS(style: AnimationStyle, progress: number): React.
       }
       break;
 
-    case 'jitter-shake':
+    case 'jitter-shake': {
       if (progress < 0.2) {
         const shake = Math.sin(progress * 100) * 5 * (1 - progress / 0.2);
         styles.transform = `translate(${shake}px, ${shake}px)`;
       }
       break;
+    }
 
     case 'underline-wipe':
       styles.position = 'relative';
@@ -213,18 +219,20 @@ export function getAnimationCSS(style: AnimationStyle, progress: number): React.
       }
       break;
 
-    case 'bounce-scale':
+    case 'bounce-scale': {
       const bounce = Math.abs(Math.sin(progress * Math.PI * 2));
       styles.transform = `scale(${1 + bounce * 0.2})`;
       break;
+    }
 
-    case 'gradient-sweep':
+    case 'gradient-sweep': {
       const gradientPos = progress * 200 - 100;
       styles.background = `linear-gradient(90deg, #ffffff ${gradientPos}%, #fbbf24 ${gradientPos + 50}%, #ffffff ${gradientPos + 100}%)`;
       styles.WebkitBackgroundClip = 'text';
       styles.WebkitTextFillColor = 'transparent';
       styles.backgroundClip = 'text';
       break;
+    }
 
     case 'bottom-third-static':
     case 'none':

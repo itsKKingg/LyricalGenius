@@ -15,7 +15,7 @@ export function useEditor() {
 
       return () => clearTimeout(timeout);
     }
-  }, [store.currentProject]);
+  }, [store.currentProject, history]);
 
   const undo = () => {
     const previous = history.undo();

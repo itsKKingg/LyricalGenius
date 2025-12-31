@@ -27,7 +27,7 @@ export default function TemplatesTab() {
       return;
     }
 
-    batchUpdateCaptions(captionIds, { animationStyle: templateId as any });
+    batchUpdateCaptions(captionIds, { animationStyle: templateId as import('../../types').AnimationStyle });
   };
 
   return (

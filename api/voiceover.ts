@@ -51,11 +51,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       duration: estimatedDuration,
     });
 
-  } catch (error: any) {
-    console.error('Voiceover generation error:', error);
+  } catch (error) {
+    const err = error as Error;
+    console.error('Voiceover generation error:', err);
     return res.status(500).json({
       error: 'Voiceover generation failed',
-      message: error.message || 'An unknown error occurred',
+      message: err.message || 'An unknown error occurred',
     });
   }
 }

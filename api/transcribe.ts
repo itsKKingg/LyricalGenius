@@ -134,7 +134,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }));
     }
 
-    const fullText = segments.map((s: any) => s.text).join(' ');
+    const fullText = segments.map((s: { text: string }) => s.text).join(' ');
 
     return res.status(200).json({
       segments,
@@ -143,11 +143,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       language: language,
     });
 
-  } catch (error: any) {
-    console.error('Transcription error:', error);
+  } catch (error) {
+    const err = error as Error;
+    console.error('Transcription error:', err);
     return res.status(500).json({
       error: 'Transcription failed',
-      message: error.message || 'An unknown error occurred',
+      message: err.message || 'An unknown error occurred',
     });
   }
 }

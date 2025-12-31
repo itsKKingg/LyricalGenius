@@ -28,7 +28,7 @@ export async function generateVoiceover(
 
     const data: VoiceoverResponse = await response.json();
     return data;
-  } catch (error: any) {
+  } catch (error) {
     console.error('Voiceover generation error:', error);
     throw error;
   }

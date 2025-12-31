@@ -46,9 +46,10 @@ export default function CaptionTab() {
 
       setError(null);
       alert(`✅ ${result.segments.length} lyrics generated!`);
-    } catch (err: any) {
-      console.error('Auto lyrics error:', err);
-      setError(err.message || 'Failed to generate lyrics. Please check your API configuration.');
+    } catch (err) {
+      const error = err as Error;
+      console.error('Auto lyrics error:', error);
+      setError(error.message || 'Failed to generate lyrics. Please check your API configuration.');
     } finally {
       setLoading(false);
     }

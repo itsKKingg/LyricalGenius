@@ -145,7 +145,7 @@ export default function Timeline() {
                     }
 
                     const startX = ('startMs' in clip ? clip.startMs : 0) * pixelsPerMs;
-                    const width = ('endMs' in clip ? clip.endMs - clip.startMs : (clip as any).durationMs) * pixelsPerMs;
+                    const width = ('endMs' in clip ? clip.endMs - clip.startMs : ('durationMs' in clip ? clip.durationMs : 0)) * pixelsPerMs;
 
                     return (
                       <div
