@@ -1,0 +1,13 @@
+name = "lyricalgenius"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./dist"
+
+# Environment variables (set these in Cloudflare dashboard or via wrangler secret)
+# GEMINI_API_KEY
+# ELEVENLABS_API_KEY
+
+[build]
+command = "npm run build"
+
+[env.production]
+# Production environment settings

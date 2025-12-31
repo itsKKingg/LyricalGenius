@@ -32,30 +32,13 @@ async function getDB() {
 
 export async function saveProject(project: Project): Promise<void> {
   const db = await getDB()
-  
-  if (project.audioFile) {
-    await db.put('audioFiles', {
-      id: project.id,
-      blob: project.audioFile,
-    })
-  }
-  
-  const projectToSave = { ...project, audioFile: null }
-  await db.put('projects', projectToSave)
+  await db.put('projects', project)
 }
 
 export async function loadProject(id: string): Promise<Project | null> {
   const db = await getDB()
   const project = await db.get('projects', id)
-  
-  if (!project) return null
-  
-  const audioFile = await db.get('audioFiles', id)
-  if (audioFile) {
-    project.audioFile = new File([audioFile.blob], project.name, { type: audioFile.blob.type })
-  }
-  
-  return project
+  return project || null
 }
 
 export async function getAllProjects(): Promise<Project[]> {

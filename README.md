@@ -1,57 +1,82 @@
-# 🎵 LyricalGenius
+# LyricalGenius - Professional Lyric Video Editor
 
-**The ultimate privacy-first lyric video generator for musicians and creators in 2025.**
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Create professional, viral-ready lyric videos for TikTok, Instagram Reels, and YouTube Shorts — entirely in your browser. No uploads, no servers, no subscriptions. Just pure client-side magic.
+**LyricalGenius** is a professional, production-ready lyric video editor with **Auto Lyrics** as the standout feature. Built for musicians and creators to generate viral TikTok/Reels/YouTube Shorts content.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
-[![Built with React](https://img.shields.io/badge/Built%20with-React%2018-61dafb.svg)](https://reactjs.org/)
-[![Powered by WebAssembly](https://img.shields.io/badge/Powered%20by-WebAssembly-654ff0.svg)](https://webassembly.org/)
+## 🎯 Key Features
 
----
+### 🌟 Auto Lyrics (Hero Feature)
+- **AI-Powered Transcription** via Google Gemini API
+- Automatic timing synchronization
+- Support for 9+ languages
+- One-click generation of timed lyrics
+- Professional karaoke-style animations
 
-## ✨ Features
+### 🎨 Professional Multi-Panel UI
+- **Top Toolbar**: Undo/Redo, Play/Pause, Export
+- **Left Sidebar**: Media, Captions, Effects, Stickers, Audio, Templates
+- **Center Canvas**: Real-time preview with aspect ratio switching (9:16, 16:9, 1:1)
+- **Bottom Timeline**: Multi-track editing with draggable clips
+- **Right Properties**: Contextual editing panel
 
-### 🔒 **100% Privacy-First**
-- All audio processing happens in your browser
-- Your music never leaves your device
-- No account required, no tracking, no data collection
-- Open source and transparent
+### ✨ 20+ Animation Templates
+- Karaoke Highlight
+- Bottom Third Static
+- Center Pop-In
+- Word-by-Word Bounce
+- Neon Glow
+- Typewriter
+- Gradient Sweep
+- Blur Fade
+- Scale Pulse
+- Flip 3D
+- Slide In (Left/Right)
+- Explode Particles
+- Rainbow Cycle
+- Bold Entrance
+- Jitter Shake
+- Outline Stroke
+- Underline Wipe
+- Fade + Blur
+- Skew Perspective
+- Bounce Scale
+- ...and more!
 
-### 🎨 **Professional Editor**
-- Real-time video preview with 9:16, 1:1, and 16:9 formats
-- Interactive waveform timeline with precise scrubbing
-- Advanced typography controls (fonts, sizes, colors, strokes, glows)
-- Multiple text animations (fade, scale, slide, bounce, typewriter, karaoke)
-- Audio-reactive visualizers (circular, wave, bars, mirror)
+### 🎬 Video Editing
+- Multi-track timeline with zoom (10%-400%)
+- Drag & drop clips
+- Track locking and visibility toggles
+- Real-time preview rendering
+- Aspect ratio switching
+- Project auto-save (every 10 seconds)
 
-### 🚀 **Viral Presets**
-One-click apply professional styles:
-- **2025 TikTok Hook** - Bold, punchy text with kinetic animations
-- **Reels Emotional** - Soft, elegant fades for heartfelt lyrics
-- **Brat Summer** - Lime green maximalist energy
-- **Lo-Fi Chill** - Mellow vibes with subtle grain
-- **Neon Club** - High-energy EDM with strobing effects
+### 🎵 Audio Support
+- Audio file upload and playback
+- Waveform visualization
+- Multiple audio tracks
+- Volume control
 
-### 🎬 **Export Options**
-- MP4 video export (1080p, 720p, 480p)
-- GIF export for quick sharing
-- 30 or 60 FPS output
-- Platform-optimized formats
+### 💾 Project Management
+- IndexedDB persistence
+- Auto-save functionality
+- Undo/Redo stack (50 history steps)
+- Project name editing
 
-### 🎯 **Advanced Features**
-- Manual lyric editing with timestamp adjustment
-- Beat detection and waveform visualization
-- Custom watermark support
-- Background customization (gradients, images, blurred album art)
-- Fully responsive UI with dark mode
+### ⌨️ Keyboard Shortcuts
+- `Space` - Play/Pause
+- `Ctrl+Z` / `Cmd+Z` - Undo
+- `Ctrl+Shift+Z` / `Cmd+Shift+Z` - Redo
+- `Delete` / `Backspace` - Delete selected clips
+- `Escape` - Deselect all
 
----
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm
+- Google Gemini API key (for Auto Lyrics)
+- Optional: ElevenLabs API key (for voiceover generation)
 
 ### Installation
 
@@ -63,161 +88,194 @@ cd lyricalgenius
 # Install dependencies
 npm install
 
+# Create environment file
+cp .env.example .env.local
+
+# Add your API keys to .env.local
+# GEMINI_API_KEY=your_google_gemini_api_key
+# ELEVENLABS_API_KEY=your_elevenlabs_api_key (optional)
+
 # Start development server
 npm run dev
 ```
 
-Visit `http://localhost:5173` to see the app in action.
+Visit `http://localhost:5173` to see the app.
 
-### Building for Production
+### Deployment
 
+**Quick Deploy**: See [DEPLOY_QUICK_START.md](./DEPLOY_QUICK_START.md)  
+**Full Guide**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)  
+**Platform Comparison**: See [PLATFORM_COMPARISON.md](./PLATFORM_COMPARISON.md)
+
+#### Option 1: Vercel (Recommended for Beginners)
 ```bash
-# Create optimized production build
-npm run build
+# Install Vercel CLI
+npm i -g vercel
 
-# Preview production build
+# Deploy
+npm run deploy:vercel
+
+# Set environment variables in Vercel dashboard:
+# - GEMINI_API_KEY
+# - ELEVENLABS_API_KEY (optional)
+```
+
+#### Option 2: Cloudflare Pages (Recommended for Scale)
+```bash
+# Install Wrangler CLI
+npm i -g wrangler
+
+# Deploy
+npm run deploy:cloudflare
+
+# Set secrets via CLI:
+wrangler pages secret put GEMINI_API_KEY
+wrangler pages secret put ELEVENLABS_API_KEY
+```
+
+#### Build for Production
+```bash
+npm run build
 npm run preview
 ```
 
-The built files will be in the `dist/` directory, ready to deploy to any static hosting service.
-
-### Deploying to Cloudflare
-
-```bash
-# Deploy to Cloudflare Pages
-npm run deploy:cloudflare
-```
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions for Vercel, Netlify, GitHub Pages, and more.
-
----
-
-## 📖 Usage Guide
-
-### 1. **Upload Your Song**
-- Drag and drop an audio file (MP3, WAV, M4A, OGG) or click to browse
-- The app will automatically extract metadata and generate a waveform
-
-### 2. **Add Lyrics**
-- Manually add lyric lines with start/end timestamps
-- Edit text and timing with a simple interface
-- Auto-transcription coming soon
-
-### 3. **Customize Your Video**
-- **Text Tab**: Adjust font, size, color, stroke, shadow, glow
-- **Background Tab**: Choose gradients, colors, or upload images
-- **Effects Tab**: Select animations and audio visualizers
-- **Presets**: Apply viral-ready styles in one click
-
-### 4. **Export**
-- Choose your format (9:16, 1:1, 16:9)
-- Select resolution and frame rate
-- Export as MP4 or GIF directly to your device
-
----
-
-## 🏗️ Tech Stack
-
-- **Framework**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **Persistence**: IndexedDB (via idb)
-- **Icons**: Lucide React
-- **Audio Processing**: Web Audio API
-- **Video Export**: Canvas API + MediaRecorder API
-- **Routing**: React Router
-
----
-
-## 🗂️ Project Structure
+## 📁 Project Structure
 
 ```
 lyricalgenius/
-├── public/               # Static assets
+├── api/                      # Vercel serverless functions
+│   ├── transcribe.ts        # Google Gemini transcription endpoint
+│   └── voiceover.ts         # ElevenLabs voiceover endpoint
+├── functions/api/            # Cloudflare Pages functions (same endpoints)
+│   ├── transcribe.ts        # Cloudflare-compatible transcription
+│   └── voiceover.ts         # Cloudflare-compatible voiceover
 ├── src/
-│   ├── components/       # React components
-│   │   └── editor/       # Editor-specific components
-│   │       ├── tabs/     # Control panel tabs
-│   │       ├── Sidebar.tsx
-│   │       ├── VideoPreview.tsx
-│   │       ├── CanvasRenderer.tsx
-│   │       ├── Timeline.tsx
-│   │       └── ControlPanel.tsx
-│   ├── contexts/         # React contexts (Theme)
-│   ├── pages/            # Page components
-│   │   ├── HomePage.tsx
-│   │   ├── EditorPage.tsx
-│   │   └── ProjectsPage.tsx
-│   ├── stores/           # Zustand stores
-│   │   └── projectStore.ts
-│   ├── types/            # TypeScript types
-│   │   └── index.ts
-│   ├── utils/            # Utility functions
-│   │   ├── audio.ts      # Audio processing
-│   │   ├── db.ts         # IndexedDB operations
-│   │   ├── cn.ts         # Classname utilities
-│   │   └── presets.ts    # Viral presets
-│   ├── App.tsx           # Main app component
-│   ├── main.tsx          # Entry point
-│   └── index.css         # Global styles
-├── index.html
+│   ├── api/                 # Frontend API clients
+│   ├── components/
+│   │   ├── tabs/           # Sidebar tab components
+│   │   ├── modals/         # Modal dialogs
+│   │   ├── Editor.tsx      # Main editor layout
+│   │   ├── Toolbar.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── PreviewCanvas.tsx
+│   │   ├── Timeline.tsx
+│   │   └── PropertiesPanel.tsx
+│   ├── hooks/              # Custom React hooks
+│   ├── stores/             # Zustand state management
+│   ├── types/              # TypeScript type definitions
+│   ├── utils/              # Utility functions
+│   ├── App.tsx
+│   └── main.tsx
+├── .env.example            # Environment template
+├── package.json
 ├── tailwind.config.js
-├── vite.config.ts
 ├── tsconfig.json
-└── package.json
+├── vite.config.ts
+└── vercel.json            # Vercel deployment config
 ```
 
----
+## 🔧 Tech Stack
 
-## 🎯 Roadmap
+### Frontend
+- **React 18** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling
+- **Zustand** - State management
+- **IndexedDB (idb)** - Local persistence
+- **Lucide React** - Icons
+- **Web Audio API** - Audio playback
+- **Canvas API** - Video preview rendering
 
-### Coming Soon
-- [ ] Auto-transcription with Whisper.wasm
-- [ ] Batch processing mode
-- [ ] Platform-specific thumbnail generation
-- [ ] More visualizer styles (WebGL shaders)
-- [ ] Custom font upload support
-- [ ] Lyrics import from .lrc files
-- [ ] Video clip suggestions (detect hooks/chorus)
-- [ ] Collaborative editing (share project links)
-- [ ] Mobile app (React Native)
+### Backend
+- **Vercel Serverless Functions** - API endpoints
+- **Google Gemini API** - AI transcription
+- **ElevenLabs API** - Text-to-speech (optional)
 
----
+## 🎯 Usage
 
-## 🤝 Contributing
+### 1. Upload Audio
+- Click **Media** tab in left sidebar
+- Upload an audio file (MP3, WAV, etc.)
+- Audio automatically appears on timeline
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### 2. Generate Auto Lyrics
+- Click **Text/Captions** tab
+- Select voice language (English, Spanish, French, etc.)
+- Click **"Generate Auto Lyrics"** button
+- Wait for AI transcription (5-30 seconds)
+- Lyrics appear as individual clips on timeline
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### 3. Customize Captions
+- Click any caption clip on timeline to select
+- Edit text in **Properties Panel** (right side)
+- Adjust font, size, color, alignment
+- Change timing (start/end times)
 
----
+### 4. Apply Animation Templates
+- Click **Templates** tab
+- Select one or more caption clips
+- Click an animation template to apply
+- Preview in center canvas
+
+### 5. Export Video
+- Click **Export** button in top toolbar
+- Choose preset (TikTok, Instagram Reels, YouTube Shorts, etc.)
+- Select quality and format
+- Click **Export Video**
+
+## 🔐 API Configuration
+
+### Google Gemini API
+1. Get API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Add to `.env.local`:
+   ```
+   GEMINI_API_KEY=your_key_here
+   ```
+3. For Vercel: Add to project environment variables
+
+### ElevenLabs API (Optional)
+1. Get API key from [ElevenLabs](https://elevenlabs.io)
+2. Add to `.env.local`:
+   ```
+   ELEVENLABS_API_KEY=your_key_here
+   ```
+
+## 🎨 Design Philosophy
+
+- **Professional First** - No generic AI aesthetic, video-editor-like interface
+- **Musician-Friendly** - Built for music creators, not generic video makers
+- **Vector Text Only** - All captions rendered as HTML/CSS, not canvas/image
+- **Privacy-First** - All processing client-side (except AI APIs)
+- **Light Mode Primary** - Clean, off-white workspace with dark accents
+
+## 🐛 Known Limitations
+
+- Export functionality is placeholder (needs MediaRecorder API or server rendering)
+- No batch processing yet
+- Background visualizers coming soon
+- Mobile support limited (desktop-optimized)
+
+## 📝 Contributing
+
+Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🙏 Acknowledgments
 
-- Built for independent artists who value privacy
-- Inspired by professional lyric video tools
-- Powered by modern web standards and open-source technologies
+- Google Gemini for AI transcription
+- ElevenLabs for voiceover generation
+- Vercel for hosting and serverless functions
+- React, Vite, and Tailwind teams
+
+## 📧 Support
+
+- GitHub Issues: [Report a bug](https://github.com/yourusername/lyricalgenius/issues)
+- Discussions: [Ask questions](https://github.com/yourusername/lyricalgenius/discussions)
 
 ---
 
-## 💬 Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/lyricalgenius/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/lyricalgenius/discussions)
-
----
-
-**Made with ❤️ for independent artists · No sign-up required · Open source**
-
-🌟 If you find this useful, please star the repo!
+**Made with ❤️ for musicians and creators worldwide**
