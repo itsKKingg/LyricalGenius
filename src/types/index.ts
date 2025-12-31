@@ -1,106 +1,142 @@
+export type AnimationStyle =
+  | 'karaoke-highlight'
+  | 'bottom-third-static'
+  | 'center-pop-in'
+  | 'word-bounce'
+  | 'neon-glow'
+  | 'typewriter'
+  | 'gradient-sweep'
+  | 'blur-fade'
+  | 'scale-pulse'
+  | 'flip-3d'
+  | 'slide-in-left'
+  | 'slide-in-right'
+  | 'explode-particles'
+  | 'rainbow-cycle'
+  | 'bold-entrance'
+  | 'jitter-shake'
+  | 'outline-stroke'
+  | 'underline-wipe'
+  | 'fade-blur'
+  | 'skew-perspective'
+  | 'bounce-scale'
+  | 'none';
+
+export interface AnimationTemplate {
+  id: AnimationStyle;
+  name: string;
+  description: string;
+  thumbnail?: string;
+}
+
+export interface Caption {
+  id: string;
+  text: string;
+  startMs: number;
+  endMs: number;
+  style: CaptionStyle;
+  track: number; // For multi-track captions
+}
+
+export interface CaptionStyle {
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: 'normal' | 'bold' | 'bolder';
+  color: string;
+  animationStyle: AnimationStyle;
+  outlineColor?: string;
+  outlineWidth?: number;
+  shadowColor?: string;
+  shadowBlur?: number;
+  glowColor?: string;
+  glowIntensity?: number;
+  alignment: 'left' | 'center' | 'right';
+  positionX: number; // Percentage
+  positionY: number; // Percentage
+}
+
+export interface VideoClip {
+  id: string;
+  type: 'video' | 'image' | 'background';
+  src: string;
+  startMs: number;
+  durationMs: number;
+  track: number;
+  opacity: number;
+  scale: number;
+  positionX: number;
+  positionY: number;
+  rotation: number;
+}
+
+export interface AudioClip {
+  id: string;
+  type: 'audio' | 'music' | 'voiceover';
+  src: string;
+  startMs: number;
+  durationMs: number;
+  track: number;
+  volume: number;
+  waveformData?: number[];
+}
+
+export type ClipType = VideoClip | AudioClip | Caption;
+
+export interface Track {
+  id: string;
+  type: 'video' | 'audio' | 'caption';
+  name: string;
+  locked: boolean;
+  visible: boolean;
+  clips: ClipType[];
+}
+
 export interface Project {
-  id: string
-  name: string
-  audioUrl: string
-  audioFile: File | null
-  duration: number
-  waveformData: number[]
-  lyrics: LyricLine[]
-  settings: ProjectSettings
-  createdAt: number
-  updatedAt: number
-  thumbnail?: string
-  albumArt?: string
-}
-
-export interface LyricLine {
-  id: string
-  text: string
-  startTime: number
-  endTime: number
-  words?: LyricWord[]
-  confidence?: number
-}
-
-export interface LyricWord {
-  text: string
-  startTime: number
-  endTime: number
-  confidence?: number
+  id: string;
+  name: string;
+  createdAt: number;
+  updatedAt: number;
+  duration: number; // in milliseconds
+  fps: number;
+  width: number;
+  height: number;
+  aspectRatio: '9:16' | '16:9' | '1:1';
+  backgroundColor: string;
+  tracks: Track[];
+  settings: ProjectSettings;
 }
 
 export interface ProjectSettings {
-  videoFormat: '9:16' | '1:1' | '16:9'
-  resolution: '1080p' | '720p' | '480p'
-  fps: 30 | 60
-  
-  // Text styling
-  fontFamily: string
-  fontSize: number
-  fontWeight: number
-  textColor: string
-  textAlign: 'left' | 'center' | 'right'
-  textStroke: boolean
-  textStrokeWidth: number
-  textStrokeColor: string
-  textShadow: boolean
-  textGlow: boolean
-  letterSpacing: number
-  lineHeight: number
-  
-  // Animations
-  animationStyle: 'fade' | 'scale' | 'slide' | 'bounce' | 'typewriter' | 'karaoke' | 'none'
-  animationDuration: number
-  
-  // Caption positioning
-  captionPosition: 'bottom' | 'center' | 'top'
-  captionYOffset: number
-  
-  // Background
-  backgroundType: 'gradient' | 'image' | 'albumArt' | 'video' | 'visualizer'
-  backgroundColor: string
-  backgroundGradient: string[]
-  backgroundImage?: string
-  backgroundBlur: number
-  
-  // Visualizer
-  visualizerStyle: 'circular' | 'wave' | 'bars' | 'mirror' | 'none'
-  visualizerIntensity: number
-  visualizerColor: string
-  
-  // Watermark
-  watermarkEnabled: boolean
-  watermarkText: string
-  watermarkPosition: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'
-  watermarkOpacity: number
-  
-  // Audio
-  volume: number
-  
-  // Preset
-  preset?: string
+  fps: number;
+  resolution: {
+    width: number;
+    height: number;
+  };
+  backgroundColor: string;
+  backgroundBlur: number;
 }
 
-export interface Preset {
-  id: string
-  name: string
-  description: string
-  thumbnail: string
-  settings: Partial<ProjectSettings>
+export interface EditorState {
+  currentProject: Project | null;
+  selectedClips: string[];
+  currentTime: number;
+  isPlaying: boolean;
+  zoom: number; // 10% to 400%
+  playbackRate: number;
 }
 
-export interface ExportOptions {
-  format: 'mp4' | 'gif'
-  quality: 'high' | 'medium' | 'low'
-  startTime?: number
-  endTime?: number
+export interface HistoryState {
+  past: EditorState[];
+  present: EditorState;
+  future: EditorState[];
 }
 
-export interface BatchJob {
-  id: string
-  projects: Project[]
-  sharedSettings: Partial<ProjectSettings>
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  progress: number
-  currentIndex: number
+export interface MediaFile {
+  id: string;
+  name: string;
+  type: 'audio' | 'video' | 'image';
+  src: string;
+  duration?: number;
+  size: number;
+  uploadedAt: number;
 }
