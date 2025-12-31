@@ -1,22 +1,23 @@
 import { useState } from 'react'
 import { Download, Film, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { useProjectStore } from '../../../stores/projectStore'
+import type { ProjectSettings } from '../../../types'
 
 const VIDEO_FORMATS = [
-  { value: '9:16', label: 'TikTok/Reels (9:16)', description: '1080x1920' },
-  { value: '1:1', label: 'Instagram Square (1:1)', description: '1080x1080' },
-  { value: '16:9', label: 'YouTube (16:9)', description: '1920x1080' },
+  { value: '9:16' as const, label: 'TikTok/Reels (9:16)', description: '1080x1920' },
+  { value: '1:1' as const, label: 'Instagram Square (1:1)', description: '1080x1080' },
+  { value: '16:9' as const, label: 'YouTube (16:9)', description: '1920x1080' },
 ]
 
 const RESOLUTIONS = [
-  { value: '1080p', label: '1080p (Full HD)' },
-  { value: '720p', label: '720p (HD)' },
-  { value: '480p', label: '480p (SD)' },
+  { value: '1080p' as const, label: '1080p (Full HD)' },
+  { value: '720p' as const, label: '720p (HD)' },
+  { value: '480p' as const, label: '480p (SD)' },
 ]
 
 const FPS_OPTIONS = [
-  { value: 30, label: '30 FPS' },
-  { value: 60, label: '60 FPS' },
+  { value: 30 as const, label: '30 FPS' },
+  { value: 60 as const, label: '60 FPS' },
 ]
 
 export default function ExportTab() {
@@ -57,7 +58,7 @@ export default function ExportTab() {
           {VIDEO_FORMATS.map(format => (
             <button
               key={format.value}
-              onClick={() => updateSettings({ videoFormat: format.value as any })}
+              onClick={() => updateSettings({ videoFormat: format.value as ProjectSettings['videoFormat'] })}
               className={`
                 w-full text-left p-3 rounded-lg border transition-colors
                 ${settings.videoFormat === format.value
@@ -79,7 +80,7 @@ export default function ExportTab() {
           {RESOLUTIONS.map(res => (
             <button
               key={res.value}
-              onClick={() => updateSettings({ resolution: res.value as any })}
+              onClick={() => updateSettings({ resolution: res.value as ProjectSettings['resolution'] })}
               className={`
                 w-full text-left px-3 py-2 rounded-lg border transition-colors text-sm
                 ${settings.resolution === res.value
@@ -100,7 +101,7 @@ export default function ExportTab() {
           {FPS_OPTIONS.map(fps => (
             <button
               key={fps.value}
-              onClick={() => updateSettings({ fps: fps.value as any })}
+              onClick={() => updateSettings({ fps: fps.value as ProjectSettings['fps'] })}
               className={`
                 px-3 py-2 rounded-lg border transition-colors text-sm
                 ${settings.fps === fps.value

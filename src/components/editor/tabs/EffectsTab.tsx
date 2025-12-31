@@ -1,21 +1,23 @@
 import { useProjectStore } from '../../../stores/projectStore'
+import TemplateGallery from '../../TemplateGallery'
+import type { ProjectSettings } from '../../../types'
 
 const ANIMATION_STYLES = [
-  { value: 'none', label: 'None' },
-  { value: 'fade', label: 'Fade' },
-  { value: 'scale', label: 'Scale' },
-  { value: 'slide', label: 'Slide' },
-  { value: 'bounce', label: 'Bounce' },
-  { value: 'typewriter', label: 'Typewriter' },
-  { value: 'karaoke', label: 'Karaoke' },
+  { value: 'none' as const, label: 'None' },
+  { value: 'fade' as const, label: 'Fade' },
+  { value: 'scale' as const, label: 'Scale' },
+  { value: 'slide' as const, label: 'Slide' },
+  { value: 'bounce' as const, label: 'Bounce' },
+  { value: 'typewriter' as const, label: 'Typewriter' },
+  { value: 'karaoke' as const, label: 'Karaoke' },
 ]
 
 const VISUALIZER_STYLES = [
-  { value: 'none', label: 'None' },
-  { value: 'circular', label: 'Circular' },
-  { value: 'wave', label: 'Wave' },
-  { value: 'bars', label: 'Bars' },
-  { value: 'mirror', label: 'Mirror' },
+  { value: 'none' as const, label: 'None' },
+  { value: 'circular' as const, label: 'Circular' },
+  { value: 'wave' as const, label: 'Wave' },
+  { value: 'bars' as const, label: 'Bars' },
+  { value: 'mirror' as const, label: 'Mirror' },
 ]
 
 export default function EffectsTab() {
@@ -28,15 +30,20 @@ export default function EffectsTab() {
 
   return (
     <div className="p-4 space-y-6">
+      {/* Template Gallery */}
+      <div className="pb-4 border-b border-gray-800">
+        <TemplateGallery />
+      </div>
+
       <div>
-        <h3 className="text-sm font-semibold mb-3">Text Animation</h3>
-        
+        <h3 className="text-sm font-semibold mb-3">Custom Animation</h3>
+
         <label className="block text-sm font-medium mb-2">Animation Style</label>
         <div className="grid grid-cols-2 gap-2">
           {ANIMATION_STYLES.map(style => (
             <button
               key={style.value}
-              onClick={() => updateSettings({ animationStyle: style.value as any })}
+              onClick={() => updateSettings({ animationStyle: style.value as ProjectSettings['animationStyle'] })}
               className={`
                 px-3 py-2 rounded-lg border transition-colors text-xs
                 ${settings.animationStyle === style.value
@@ -68,13 +75,13 @@ export default function EffectsTab() {
 
       <div className="pt-4 border-t border-gray-800">
         <h3 className="text-sm font-semibold mb-3">Audio Visualizer</h3>
-        
+
         <label className="block text-sm font-medium mb-2">Visualizer Style</label>
         <div className="grid grid-cols-2 gap-2">
           {VISUALIZER_STYLES.map(style => (
             <button
               key={style.value}
-              onClick={() => updateSettings({ visualizerStyle: style.value as any })}
+              onClick={() => updateSettings({ visualizerStyle: style.value as ProjectSettings['visualizerStyle'] })}
               className={`
                 px-3 py-2 rounded-lg border transition-colors text-xs
                 ${settings.visualizerStyle === style.value
@@ -155,14 +162,14 @@ export default function EffectsTab() {
               <label className="block text-sm font-medium mb-2">Position</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { value: 'topLeft', label: 'Top Left' },
-                  { value: 'topRight', label: 'Top Right' },
-                  { value: 'bottomLeft', label: 'Bottom Left' },
-                  { value: 'bottomRight', label: 'Bottom Right' },
+                  { value: 'topLeft' as const, label: 'Top Left' },
+                  { value: 'topRight' as const, label: 'Top Right' },
+                  { value: 'bottomLeft' as const, label: 'Bottom Left' },
+                  { value: 'bottomRight' as const, label: 'Bottom Right' },
                 ].map(pos => (
                   <button
                     key={pos.value}
-                    onClick={() => updateSettings({ watermarkPosition: pos.value as any })}
+                    onClick={() => updateSettings({ watermarkPosition: pos.value as ProjectSettings['watermarkPosition'] })}
                     className={`
                       px-3 py-2 rounded-lg border transition-colors text-xs
                       ${settings.watermarkPosition === pos.value

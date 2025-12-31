@@ -12,6 +12,14 @@ Create professional, viral-ready lyric videos for TikTok, Instagram Reels, and Y
 
 ## ✨ Features
 
+### 🎤 **Auto Lyrics - Powered by AI** ⭐
+- **One-click transcription** using Google Gemini API
+- Automatic timestamp generation for perfect sync
+- Support for 9+ languages (English, Spanish, French, German, etc.)
+- Confidence scoring for quality control
+- Timed lyric segments placed directly on timeline
+- 20+ professional animation templates included
+
 ### 🔒 **100% Privacy-First**
 - All audio processing happens in your browser
 - Your music never leaves your device
@@ -52,6 +60,7 @@ One-click apply professional styles:
 
 ### Prerequisites
 - Node.js 18+ and npm
+- Google Gemini API key (for Auto Lyrics feature)
 
 ### Installation
 
@@ -63,11 +72,31 @@ cd lyricalgenius
 # Install dependencies
 npm install
 
+# Setup environment variables
+cp .env.example .env.local
+# Edit .env.local and add your GEMINI_API_KEY
+
 # Start development server
 npm run dev
 ```
 
 Visit `http://localhost:5173` to see the app in action.
+
+### Setting Up API Keys
+
+For the **Auto Lyrics** feature, you need a Google Gemini API key:
+
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API Key"
+4. Copy the key and add it to `.env.local`:
+
+```env
+GEMINI_API_KEY=your_api_key_here
+VITE_API_BASE_URL=/api
+```
+
+For detailed setup instructions, see [AUTO_LYRICS_GUIDE.md](AUTO_LYRICS_GUIDE.md).
 
 ### Building for Production
 
@@ -98,18 +127,34 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions for Verc
 - Drag and drop an audio file (MP3, WAV, M4A, OGG) or click to browse
 - The app will automatically extract metadata and generate a waveform
 
-### 2. **Add Lyrics**
-- Manually add lyric lines with start/end timestamps
-- Edit text and timing with a simple interface
-- Auto-transcription coming soon
+### 2. **Add Lyrics - Manual or Auto**
 
-### 3. **Customize Your Video**
+**Option A: Auto-Transcribe (Recommended)**
+- Go to the **Lyrics** tab in the right panel
+- Click the purple **"Auto Lyrics"** button
+- Select audio file (uses project audio by default)
+- Choose the language of your lyrics
+- Click **"Generate Lyrics"** and wait 2-10 seconds
+- Review generated lyrics on the timeline
+
+**Option B: Manual Entry**
+- Click **"Add Line"** in the Lyrics tab
+- Type your lyrics and set start/end times
+- Adjust timing as needed
+
+### 3. **Apply Animation Templates**
+- Go to the **Effects** tab
+- Browse the **Template Gallery** with 20+ professional styles
+- Click any template to apply to all lyrics
+- Fine-tune with custom animation settings
+
+### 4. **Customize Your Video**
 - **Text Tab**: Adjust font, size, color, stroke, shadow, glow
 - **Background Tab**: Choose gradients, colors, or upload images
 - **Effects Tab**: Select animations and audio visualizers
 - **Presets**: Apply viral-ready styles in one click
 
-### 4. **Export**
+### 5. **Export**
 - Choose your format (9:16, 1:1, 16:9)
 - Select resolution and frame rate
 - Export as MP4 or GIF directly to your device
@@ -118,6 +163,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions for Verc
 
 ## 🏗️ Tech Stack
 
+### Frontend
 - **Framework**: React 18 + TypeScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
@@ -128,6 +174,11 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions for Verc
 - **Video Export**: Canvas API + MediaRecorder API
 - **Routing**: React Router
 
+### Backend (Vercel Serverless)
+- **AI Transcription**: Google Gemini API
+- **API Proxy**: Vercel Edge Functions
+- **Environment**: Secure server-side API key management
+
 ---
 
 ## 🗂️ Project Structure
@@ -135,8 +186,13 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions for Verc
 ```
 lyricalgenius/
 ├── public/               # Static assets
+├── api/                 # Vercel serverless functions
+│   └── transcribe.ts    # Audio transcription endpoint
 ├── src/
+│   ├── api/             # API client utilities
+│   │   └── transcribe.ts
 │   ├── components/       # React components
+│   │   ├── TemplateGallery.tsx  # Animation templates
 │   │   └── editor/       # Editor-specific components
 │   │       ├── tabs/     # Control panel tabs
 │   │       ├── Sidebar.tsx
@@ -152,15 +208,19 @@ lyricalgenius/
 │   ├── stores/           # Zustand stores
 │   │   └── projectStore.ts
 │   ├── types/            # TypeScript types
-│   │   └── index.ts
+│   │   ├── index.ts
+│   │   └── api.ts       # API response types
 │   ├── utils/            # Utility functions
 │   │   ├── audio.ts      # Audio processing
 │   │   ├── db.ts         # IndexedDB operations
 │   │   ├── cn.ts         # Classname utilities
-│   │   └── presets.ts    # Viral presets
+│   │   ├── presets.ts    # Viral presets
+│   │   └── time.ts       # Time formatting
 │   ├── App.tsx           # Main app component
 │   ├── main.tsx          # Entry point
 │   └── index.css         # Global styles
+├── .env.example          # Environment variables template
+├── AUTO_LYRICS_GUIDE.md  # Auto-lyrics feature documentation
 ├── index.html
 ├── tailwind.config.js
 ├── vite.config.ts

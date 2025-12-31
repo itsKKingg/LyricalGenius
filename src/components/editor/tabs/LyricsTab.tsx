@@ -1,13 +1,23 @@
 import { useState } from 'react'
-import { Plus, Edit2, Trash2, AlertCircle } from 'lucide-react'
+import { Plus, Edit2, Trash2, AlertCircle, Wand2, Loader2, X, Upload } from 'lucide-react'
 import { useProjectStore } from '../../../stores/projectStore'
 import { LyricLine } from '../../../types'
+import { transcribeAudio } from '../../../api/transcribe'
+import { msToSeconds } from '../../../utils/time'
 
 export default function LyricsTab() {
   const currentProject = useProjectStore(state => state.currentProject)
   const updateLyrics = useProjectStore(state => state.updateLyrics)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
+
+  // Auto-transcribe state
+  const [showAutoTranscribe, setShowAutoTranscribe] = useState(false)
+  const [transcribing, setTranscribing] = useState(false)
+  const [transcriptionProgress, setTranscriptionProgress] = useState(0)
+  const [selectedAudioFile, setSelectedAudioFile] = useState<File | null>(null)
+  const [language, setLanguage] = useState('en')
+  const [error, setError] = useState<string | null>(null)
 
   if (!currentProject) return null
 
@@ -49,6 +59,68 @@ export default function LyricsTab() {
       line.id === id ? { ...line, [field]: value } : line
     )
     updateLyrics(updatedLyrics)
+  }
+
+  const handleAutoTranscribe = async () => {
+    const audioToProcess = selectedAudioFile || currentProject.audioFile
+
+    if (!audioToProcess) {
+      setError('Please select an audio file first')
+      return
+    }
+
+    setTranscribing(true)
+    setError(null)
+    setTranscriptionProgress(10)
+
+    try {
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setTranscriptionProgress(prev => {
+          if (prev < 70) return prev + 10
+          return prev
+        })
+      }, 500)
+
+      const result = await transcribeAudio(audioToProcess, language)
+
+      clearInterval(progressInterval)
+      setTranscriptionProgress(90)
+
+      // Convert API response to LyricLine format
+      const newLyrics: LyricLine[] = result.segments.map((segment) => ({
+        id: crypto.randomUUID(),
+        text: segment.text,
+        startTime: msToSeconds(segment.startMs),
+        endTime: msToSeconds(segment.endMs),
+        confidence: segment.confidence,
+      }))
+
+      updateLyrics(newLyrics)
+      setTranscriptionProgress(100)
+
+      // Close modal after a short delay
+      setTimeout(() => {
+        setShowAutoTranscribe(false)
+        setTranscribing(false)
+        setTranscriptionProgress(0)
+        setSelectedAudioFile(null)
+      }, 1000)
+
+    } catch (err) {
+      console.error('Transcription failed:', err)
+      setError(err instanceof Error ? err.message : 'Transcription failed')
+      setTranscribing(false)
+      setTranscriptionProgress(0)
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedAudioFile(file)
+      setError(null)
+    }
   }
 
   return (
@@ -147,39 +219,162 @@ export default function LyricsTab() {
 
       <div className="pt-4 border-t border-gray-800">
         <button
-          disabled
-          className="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-500 cursor-not-allowed text-sm flex items-center justify-center gap-2"
+          onClick={() => setShowAutoTranscribe(true)}
+          className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 transition-all text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
         >
           <Wand2 className="w-4 h-4" />
-          Auto-Transcribe (Coming Soon)
+          Auto Lyrics
         </button>
+        <p className="text-xs text-gray-500 mt-2 text-center">
+          Upload or select audio to auto-generate timed lyrics
+        </p>
       </div>
-    </div>
-  )
-}
 
-function Wand2(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z" />
-      <path d="m14 7 3 3" />
-      <path d="M5 6v4" />
-      <path d="M19 14v4" />
-      <path d="M10 2v2" />
-      <path d="M7 8H3" />
-      <path d="M21 16h-4" />
-      <path d="M11 3H9" />
-    </svg>
+      {/* Auto-Transcribe Modal */}
+      {showAutoTranscribe && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <div className="bg-gray-900 rounded-xl border border-gray-800 w-full max-w-md shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-800">
+              <div className="flex items-center gap-2">
+                <Wand2 className="w-5 h-5 text-purple-400" />
+                <h2 className="font-semibold">Auto Lyrics Generator</h2>
+              </div>
+              <button
+                onClick={() => !transcribing && setShowAutoTranscribe(false)}
+                disabled={transcribing}
+                className="p-1 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 space-y-4">
+              {!transcribing && transcriptionProgress === 0 && (
+                <>
+                  {/* File Selection */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Audio File</label>
+                    {currentProject.audioFile && !selectedAudioFile && (
+                      <div className="p-3 rounded-lg bg-gray-800 border border-gray-700 mb-2">
+                        <p className="text-sm text-gray-300 mb-1">Current Project Audio:</p>
+                        <p className="text-xs text-gray-500 truncate">{currentProject.audioFile.name}</p>
+                      </div>
+                    )}
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={handleFileSelect}
+                        disabled={transcribing}
+                        className="hidden"
+                        id="audio-upload"
+                      />
+                      <label
+                        htmlFor="audio-upload"
+                        className={`
+                          flex items-center justify-center gap-2 p-4 rounded-lg border-2 border-dashed
+                          transition-colors cursor-pointer
+                          ${selectedAudioFile
+                            ? 'border-purple-500 bg-purple-500/10'
+                            : 'border-gray-700 hover:border-gray-600'
+                          }
+                        `}
+                      >
+                        <Upload className="w-5 h-5" />
+                        <span className="text-sm">
+                          {selectedAudioFile
+                            ? selectedAudioFile.name
+                            : 'Or upload a different file'
+                          }
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Language Selection */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Language</label>
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      disabled={transcribing}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:border-purple-500 outline-none"
+                    >
+                      <option value="en">English</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                      <option value="de">German</option>
+                      <option value="it">Italian</option>
+                      <option value="pt">Portuguese</option>
+                      <option value="ja">Japanese</option>
+                      <option value="ko">Korean</option>
+                      <option value="zh">Chinese</option>
+                    </select>
+                  </div>
+
+                  {/* Error Display */}
+                  {error && (
+                    <div className="p-3 rounded-lg bg-red-900/30 border border-red-800">
+                      <p className="text-sm text-red-400">{error}</p>
+                    </div>
+                  )}
+
+                  {/* Action Button */}
+                  <button
+                    onClick={handleAutoTranscribe}
+                    className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 transition-all text-sm font-medium flex items-center justify-center gap-2"
+                  >
+                    <Wand2 className="w-4 h-4" />
+                    Generate Lyrics
+                  </button>
+                </>
+              )}
+
+              {/* Progress State */}
+              {transcribing && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="font-medium">Transcribing Audio...</p>
+                    <p className="text-sm text-gray-400">
+                      This may take a few moments
+                    </p>
+                  </div>
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-800 rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${transcriptionProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-center text-xs text-gray-500">
+                    {transcriptionProgress}% complete
+                  </p>
+                </div>
+              )}
+
+              {/* Success State */}
+              {transcriptionProgress === 100 && !transcribing && (
+                <div className="text-center py-8 space-y-3">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-green-500/20 flex items-center justify-center">
+                    <Wand2 className="w-8 h-8 text-green-500" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-medium text-green-400">Lyrics Generated!</p>
+                    <p className="text-sm text-gray-400">
+                      {currentProject.lyrics.length} lyric lines created
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

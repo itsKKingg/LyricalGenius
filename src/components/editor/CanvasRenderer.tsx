@@ -325,17 +325,19 @@ function applyAnimation(
     case 'fade':
       ctx.globalAlpha = progress
       break
-    case 'scale':
+    case 'scale': {
       const scale = 0.5 + progress * 0.5
       ctx.scale(scale, scale)
       break
+    }
     case 'slide':
       ctx.translate(0, (1 - progress) * -50)
       break
-    case 'bounce':
+    case 'bounce': {
       const bounce = Math.sin(progress * Math.PI) * 10
       ctx.translate(0, -bounce)
       break
+    }
   }
 
   ctx.translate(-x, -y)
