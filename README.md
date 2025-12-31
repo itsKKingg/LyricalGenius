@@ -103,17 +103,34 @@ Visit `http://localhost:5173` to see the app.
 
 ### Deployment
 
-#### Vercel (Recommended)
+**Quick Deploy**: See [DEPLOY_QUICK_START.md](./DEPLOY_QUICK_START.md)  
+**Full Guide**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)  
+**Platform Comparison**: See [PLATFORM_COMPARISON.md](./PLATFORM_COMPARISON.md)
+
+#### Option 1: Vercel (Recommended for Beginners)
 ```bash
 # Install Vercel CLI
 npm i -g vercel
 
 # Deploy
-vercel
+npm run deploy:vercel
 
 # Set environment variables in Vercel dashboard:
 # - GEMINI_API_KEY
 # - ELEVENLABS_API_KEY (optional)
+```
+
+#### Option 2: Cloudflare Pages (Recommended for Scale)
+```bash
+# Install Wrangler CLI
+npm i -g wrangler
+
+# Deploy
+npm run deploy:cloudflare
+
+# Set secrets via CLI:
+wrangler pages secret put GEMINI_API_KEY
+wrangler pages secret put ELEVENLABS_API_KEY
 ```
 
 #### Build for Production
@@ -129,6 +146,9 @@ lyricalgenius/
 ├── api/                      # Vercel serverless functions
 │   ├── transcribe.ts        # Google Gemini transcription endpoint
 │   └── voiceover.ts         # ElevenLabs voiceover endpoint
+├── functions/api/            # Cloudflare Pages functions (same endpoints)
+│   ├── transcribe.ts        # Cloudflare-compatible transcription
+│   └── voiceover.ts         # Cloudflare-compatible voiceover
 ├── src/
 │   ├── api/                 # Frontend API clients
 │   ├── components/

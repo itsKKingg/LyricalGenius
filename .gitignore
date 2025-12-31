@@ -23,6 +23,14 @@ dist-ssr
 *.sln
 *.sw?
 
-# Wrangler
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Wrangler/Cloudflare
 .wrangler
 .dev.vars
+
+# Vercel
+.vercel
