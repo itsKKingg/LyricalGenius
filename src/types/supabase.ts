@@ -37,6 +37,9 @@ export interface Database {
           artist_name: string | null
           bpm: number | null
           created_at: string
+          status: string | null
+          timed_json: Json | null
+          processing_notes: string | null
         }
         Insert: {
           id?: string
@@ -45,6 +48,9 @@ export interface Database {
           artist_name?: string | null
           bpm?: number | null
           created_at?: string
+          status?: string | null
+          timed_json?: Json | null
+          processing_notes?: string | null
         }
         Update: {
           id?: string
@@ -53,6 +59,9 @@ export interface Database {
           artist_name?: string | null
           bpm?: number | null
           created_at?: string
+          status?: string | null
+          timed_json?: Json | null
+          processing_notes?: string | null
         }
       }
       lyrics_source: {
