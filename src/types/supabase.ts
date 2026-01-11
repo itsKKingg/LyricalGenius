@@ -1,0 +1,193 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string
+          user_id: string
+          username: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          username?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          username?: string | null
+          created_at?: string
+        }
+      }
+      projects: {
+        Row: {
+          id: string
+          user_id: string
+          song_title: string
+          artist_name: string | null
+          bpm: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          song_title: string
+          artist_name?: string | null
+          bpm?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          song_title?: string
+          artist_name?: string | null
+          bpm?: number | null
+          created_at?: string
+        }
+      }
+      lyrics_source: {
+        Row: {
+          id: string
+          project_id: string
+          raw_text: string
+          timed_json: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          raw_text: string
+          timed_json?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          raw_text?: string
+          timed_json?: Json | null
+          created_at?: string
+        }
+      }
+      aesthetics: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          description?: string | null
+          created_at?: string
+        }
+      }
+      aesthetic_assets: {
+        Row: {
+          id: string
+          aesthetic_id: string
+          url: string
+          media_type: 'video' | 'image' | null
+          source: 'pinterest' | 'pexels' | 'upload' | null
+          use_count: number
+          last_used_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          aesthetic_id: string
+          url: string
+          media_type?: 'video' | 'image' | null
+          source?: 'pinterest' | 'pexels' | 'upload' | null
+          use_count?: number
+          last_used_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          aesthetic_id?: string
+          url?: string
+          media_type?: 'video' | 'image' | null
+          source?: 'pinterest' | 'pexels' | 'upload' | null
+          use_count?: number
+          last_used_at?: string | null
+          created_at?: string
+        }
+      }
+      aesthetic_hooks: {
+        Row: {
+          id: string
+          aesthetic_id: string
+          text_content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          aesthetic_id: string
+          text_content: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          aesthetic_id?: string
+          text_content?: string
+          created_at?: string
+        }
+      }
+      video_edits: {
+        Row: {
+          id: string
+          project_id: string
+          aesthetic_id: string | null
+          layout_type: string
+          status: 'draft' | 'queued' | 'published'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          aesthetic_id?: string | null
+          layout_type?: string
+          status?: 'draft' | 'queued' | 'published'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          aesthetic_id?: string | null
+          layout_type?: string
+          status?: 'draft' | 'queued' | 'published'
+          created_at?: string
+        }
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+  }
+}
