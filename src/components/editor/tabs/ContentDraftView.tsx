@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, PenLine, LayoutGrid, ChevronDown } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { Button } from '../../ui/button';
 
 interface ContentDraftViewProps {
   type: 'video' | 'slideshow';

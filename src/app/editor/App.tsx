@@ -1,21 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { AestheticHeader } from './components/AestheticHeader';
-import { WorkspaceGrid } from './components/WorkspaceGrid';
-import { HomeView } from './components/views/HomeView';
-import { AestheticsListView } from './components/views/AestheticsListView';
-import { PexelsView } from './components/views/PexelsView';
-import { PinterestView } from './components/views/PinterestView';
-import { TextEditorView } from './components/views/TextEditorView';
-import { SettingsView } from './components/views/SettingsView';
-import { ContentDraftView } from './components/views/ContentDraftView';
-import { ScheduleView } from './components/views/ScheduleView';
-import { CreateContentModal } from './components/modals/CreateContentModal';
-import { ClipSelectorModal } from './components/modals/ClipSelectorModal';
-import { AudioAnalysisModal } from './components/modals/AudioAnalysisModal';
-import { WordTimelineModal } from './components/modals/WordTimelineModal';
+import React, { useState } from 'react';
+import { Sidebar } from '../../components/editor/Sidebar';
+import { HomeView } from '../../components/editor/tabs/HomeView';
+import { AestheticsListView } from '../../components/editor/tabs/AestheticsListView';
+import { PexelsView } from '../../components/editor/tabs/PexelsView';
+import { PinterestView } from '../../components/editor/tabs/PinterestView';
+import { TextEditorView } from '../../components/editor/tabs/TextEditorView';
+import { SettingsView } from '../../components/editor/tabs/SettingsView';
+import { ContentDraftView } from '../../components/editor/tabs/ContentDraftView';
+import { ScheduleView } from '../../components/editor/tabs/ScheduleView';
+import { VideoPreview } from '../../components/editor/VideoPreview';
 import { User, PenLine, Video, PlaySquare, Settings, LogOut, Moon, Sun } from 'lucide-react';
-import { AppState, Section, LyricWord, ViewType, Aesthetic } from './types';
+import { AppState, Section, LyricWord, ViewType, Aesthetic, MediaAsset } from './types';
 import { generateId } from './utils';
 
 function App() {
@@ -24,9 +19,11 @@ function App() {
     currentModal: 'NONE',
     theme: 'light', // Default theme
     activeAestheticId: null,
-    aesthetics: [], 
-    
-    // Global workspace state 
+    aesthetics: [],
+    activeTab: 'editor',
+    selectedMedia: null,
+
+    // Global workspace state
     audioFile: null,
     audioBuffer: null,
     audioDuration: 0,
@@ -39,6 +36,16 @@ function App() {
   });
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Tab Handler
+  const setActiveTab = (tab: 'editor' | 'pexels' | 'pinterest') => {
+    setState(prev => ({ ...prev, activeTab: tab }));
+  };
+
+  // Media Selection Handler
+  const handleMediaSelect = (media: MediaAsset) => {
+    setState(prev => ({ ...prev, selectedMedia: media }));
+  };
 
   // Toggle Theme Handler
   const toggleTheme = () => {
@@ -156,22 +163,38 @@ function App() {
       case 'WORKSPACE':
         const activeAesthetic = getActiveAesthetic();
         if (!activeAesthetic) return <div className="p-8 dark:text-white">Aesthetic not found.</div>;
-        
+
         return (
           <div className="flex-1 p-8 pb-32 max-w-[1600px] mx-auto w-full animate-fade-in">
-            <AestheticHeader 
-              aesthetic={activeAesthetic} 
-              onBack={() => handleNavigate('AESTHETICS')}
-            />
-            <WorkspaceGrid 
-                videos={state.videos}
-                photos={state.photos}
-                audioFile={state.audioFile}
-                audioDuration={state.audioDuration}
-                fileName={state.fileName}
-                onAudioUpload={handleAudioUpload}
-                onAudioClick={() => setState(prev => ({...prev, currentModal: 'CLIP_SELECTOR'}))}
-            />
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{activeAesthetic.name}</h1>
+                <p className="text-slate-500 dark:text-slate-400">{activeAesthetic.description}</p>
+              </div>
+              <VideoPreview selectedMedia={state.selectedMedia} />
+            </div>
+
+            {/* Tab-based content rendering */}
+            <div className="mt-8">
+              {state.activeTab === 'pexels' && (
+                <PexelsView
+                  selectedMedia={state.selectedMedia}
+                  onMediaSelect={handleMediaSelect}
+                />
+              )}
+              {state.activeTab === 'pinterest' && (
+                <PinterestView
+                  selectedMedia={state.selectedMedia}
+                  onMediaSelect={handleMediaSelect}
+                />
+              )}
+              {state.activeTab === 'editor' && (
+                <TextEditorView
+                  selectedMedia={state.selectedMedia}
+                  onMediaSelect={handleMediaSelect}
+                />
+              )}
+            </div>
           </div>
         );
 
@@ -216,12 +239,14 @@ function App() {
   return (
     <div className={`${state.theme} transition-colors duration-200`}>
       <div className="flex min-h-screen bg-workspace dark:bg-workspaceDark font-sans text-slate-900 dark:text-white selection:bg-purple-200">
-        <Sidebar 
+        <Sidebar
           currentView={state.currentView}
           activeAestheticId={state.activeAestheticId}
           aesthetics={state.aesthetics}
           onNavigate={handleNavigate}
           onCreateAesthetic={handleCreateAesthetic}
+          activeTab={state.activeTab}
+          setActiveTab={setActiveTab}
         />
         
         {/* Main Content Area */}

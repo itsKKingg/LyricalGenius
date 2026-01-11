@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, FolderOpen } from 'lucide-react';
-import { Aesthetic } from '../../types';
+import { Aesthetic } from '../../app/editor/types';
 
 interface AestheticsListViewProps {
   aesthetics: Aesthetic[];
