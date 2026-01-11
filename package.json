@@ -10,11 +10,17 @@
     "update-types": "npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/supabase.ts"
   },
   "dependencies": {
+    "@radix-ui/react-toast": "^1.2.15",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.90.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.25.0",
+    "lucide-react": "^0.562.0",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
+    "tailwind-merge": "^3.4.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
