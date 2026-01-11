@@ -36,6 +36,10 @@ export interface Database {
           song_title: string
           artist_name: string | null
           bpm: number | null
+          status: 'idle' | 'uploading' | 'isolating' | 'transcribing' | 'completed' | 'error'
+          audio_url: string | null
+          isolated_vocals_url: string | null
+          error_message: string | null
           created_at: string
         }
         Insert: {
@@ -44,6 +48,10 @@ export interface Database {
           song_title: string
           artist_name?: string | null
           bpm?: number | null
+          status?: 'idle' | 'uploading' | 'isolating' | 'transcribing' | 'completed' | 'error'
+          audio_url?: string | null
+          isolated_vocals_url?: string | null
+          error_message?: string | null
           created_at?: string
         }
         Update: {
@@ -52,6 +60,10 @@ export interface Database {
           song_title?: string
           artist_name?: string | null
           bpm?: number | null
+          status?: 'idle' | 'uploading' | 'isolating' | 'transcribing' | 'completed' | 'error'
+          audio_url?: string | null
+          isolated_vocals_url?: string | null
+          error_message?: string | null
           created_at?: string
         }
       }
