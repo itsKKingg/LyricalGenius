@@ -26,9 +26,9 @@ export interface Section {
 }
 
 export interface LyricWord {
-  word: string;
-  startTime: number;
-  endTime: number;
+  text: string;
+  start: number;
+  end: number;
 }
 
 export interface MediaAsset {
@@ -57,7 +57,7 @@ export interface AppState {
   photos: MediaAsset[];
   createContentType?: 'video' | 'slideshow';
   activeTab?: 'editor' | 'pexels' | 'pinterest';
-  selectedMedia?: MediaAsset | null;
+  selectedMedia: MediaAsset | null | undefined;
 }
 
 export type ModalType = 

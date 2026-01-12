@@ -34,7 +34,7 @@ export const ContentDraftView: React.FC<ContentDraftViewProps> = ({
           </div>
 
           <div className="flex items-center gap-4">
-             <Button variant="primary" className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 flex items-center gap-2 text-xs">
+             <Button variant="default" className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 flex items-center gap-2 text-xs">
                  Brainstorm, draft, and approve a video to proceed
                  <ChevronDown size={14} />
              </Button>
@@ -83,8 +83,14 @@ export const ContentDraftView: React.FC<ContentDraftViewProps> = ({
 
              {/* Bottom Actions */}
              <div className="flex justify-center mt-6 gap-3">
-                 <Button variant="secondary" icon={<PenLine size={16}/>} className="bg-white border-slate-200 shadow-sm text-slate-700">Edit aesthetic</Button>
-                 <Button variant="secondary" icon={<LayoutGrid size={16}/>} className="bg-white border-slate-200 shadow-sm text-slate-700">Upload your own videos</Button>
+                 <Button variant="secondary" className="bg-white border-slate-200 shadow-sm text-slate-700">
+                   <PenLine size={16} className="mr-2" />
+                   Edit aesthetic
+                 </Button>
+                 <Button variant="secondary" className="bg-white border-slate-200 shadow-sm text-slate-700">
+                   <LayoutGrid size={16} className="mr-2" />
+                   Upload your own videos
+                 </Button>
              </div>
          </div>
       </div>

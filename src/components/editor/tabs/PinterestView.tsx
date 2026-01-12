@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Film, Download, Loader2 } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
-import type { MediaAsset } from '../../app/editor/types';
+import type { MediaAsset } from '../../../app/editor/types';
 
 interface PinterestViewProps {
-  selectedMedia: MediaAsset | null;
+  selectedMedia: MediaAsset | null | undefined;
   onMediaSelect: (media: MediaAsset) => void;
 }
 
