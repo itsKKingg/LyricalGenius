@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../ui/Button';
+import { Button } from '../../ui/button';
 import { Plus, ArrowRight } from 'lucide-react';
 
 export const HomeView: React.FC<{ onCreate: () => void, onViewAesthetics: () => void }> = ({ onCreate, onViewAesthetics }) => {

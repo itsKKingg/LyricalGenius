@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, Bell, Settings, Type, List, ExternalLink, ChevronDown } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { Button } from '../../ui/button';
 
 export const ScheduleView: React.FC = () => {
   const days = ['Sun Jan 11', 'Mon Jan 12', 'Tue Jan 13', 'Wed Jan 14', 'Thu Jan 15', 'Fri Jan 16', 'Sat Jan 17'];

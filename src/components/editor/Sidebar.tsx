@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-import { 
-  Rocket, 
-  Layers, 
-  Video, 
-  Image as ImageIcon, 
-  Share2, 
-  LayoutGrid, 
-  Settings, 
+import {
+  Rocket,
+  Layers,
+  Video,
+  Image as ImageIcon,
+  Share2,
+  LayoutGrid,
+  Settings,
   Type,
   Palette,
   HelpCircle,
   Plus
 } from 'lucide-react';
-import { ViewType, Aesthetic } from '../types';
+import { ViewType, Aesthetic } from '../../app/editor/types';
 
 interface SidebarProps {
   currentView: ViewType;
@@ -20,6 +20,8 @@ interface SidebarProps {
   aesthetics: Aesthetic[];
   onNavigate: (view: ViewType, aestheticId?: string) => void;
   onCreateAesthetic: () => void;
+  activeTab?: 'editor' | 'pexels' | 'pinterest';
+  setActiveTab?: (tab: 'editor' | 'pexels' | 'pinterest') => void;
 }
 
 interface SidebarItemProps {
@@ -97,12 +99,14 @@ const SubItem: React.FC<SubItemProps> = ({
   </div>
 );
 
-export const Sidebar: React.FC<SidebarProps> = ({ 
-  currentView, 
-  activeAestheticId, 
-  aesthetics, 
+export const Sidebar: React.FC<SidebarProps> = ({
+  currentView,
+  activeAestheticId,
+  aesthetics,
   onNavigate,
-  onCreateAesthetic
+  onCreateAesthetic,
+  activeTab = 'editor',
+  setActiveTab
 }) => {
   const [aestheticsOpen, setAestheticsOpen] = useState(true);
   const [advancedOpen, setAdvancedOpen] = useState(true);
@@ -145,9 +149,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {aestheticsOpen && (
           <div className="animate-fade-in-down mb-4">
             {aesthetics.map((aesthetic) => (
-              <SubItem 
+              <SubItem
                 key={aesthetic.id}
-                label={aesthetic.name} 
+                label={aesthetic.name}
                 image={aesthetic.thumbnail}
                 isActive={currentView === 'WORKSPACE' && activeAestheticId === aesthetic.id}
                 onClick={(e) => {
@@ -156,15 +160,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
               />
             ))}
-            <div 
+            <div
               onClick={onCreateAesthetic}
               className="flex items-center gap-3 px-4 py-2 ml-4 mr-2 rounded-lg cursor-pointer mb-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:text-slate-500 dark:hover:text-indigo-400 dark:hover:bg-slate-800/30 transition-colors group"
             >
-              <div className="w-5 h-5 flex items-center justify-center border border-dashed border-current rounded-md">
-                 <Plus size={12} />
-              </div>
-              <span className="text-sm font-medium">Create new</span>
+               <div className="w-5 h-5 flex items-center justify-center border border-dashed border-current rounded-md">
+                  <Plus size={12} />
+               </div>
+               <span className="text-sm font-medium">Create new</span>
             </div>
+
+            {/* Workspace Tabs - Only show when in WORKSPACE view */}
+            {currentView === 'WORKSPACE' && setActiveTab && (
+              <div className="mt-4 mb-2 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-wider dark:text-slate-600">Workspace Tabs</div>
+            )}
+            {currentView === 'WORKSPACE' && setActiveTab && (
+              <div className="animate-fade-in-down mb-4">
+                <SubItem
+                  label="Editor"
+                  isActive={activeTab === 'editor'}
+                  onClick={() => setActiveTab('editor')}
+                />
+                <SubItem
+                  label="Pexels"
+                  isActive={activeTab === 'pexels'}
+                  onClick={() => setActiveTab('pexels')}
+                />
+                <SubItem
+                  label="Pinterest"
+                  isActive={activeTab === 'pinterest'}
+                  onClick={() => setActiveTab('pinterest')}
+                />
+              </div>
+            )}
           </div>
         )}
         

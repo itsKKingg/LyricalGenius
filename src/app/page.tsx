@@ -12,10 +12,10 @@ export default function Home() {
         </p>
         <div className="space-y-4">
           <Link
-            href="/aesthetics"
+            href="/editor"
             className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
-            Browse Aesthetics
+            Open Editor
           </Link>
           <p className="text-sm text-gray-500">
             Search and save aesthetic video assets from Pinterest and Pexels
