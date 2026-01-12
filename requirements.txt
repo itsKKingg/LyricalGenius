@@ -1,3 +1,5 @@
 pinterest-dl
 flask
 flask-cors
+moviepy
+imageio-ffmpeg
