@@ -1,0 +1,56 @@
+{
+  "background_url": "/path/to/your/background_video.mp4",
+  "audio_url": "/path/to/your/audio_file.mp3",
+  "lyrics": [
+    {
+      "text": "Welcome",
+      "start": 0,
+      "end": 1200
+    },
+    {
+      "text": "to the",
+      "start": 1200,
+      "end": 2200
+    },
+    {
+      "text": "Lyric Video",
+      "start": 2200,
+      "end": 3800
+    },
+    {
+      "text": "Generator",
+      "start": 3800,
+      "end": 5400
+    },
+    {
+      "text": "Dynamic",
+      "start": 5400,
+      "end": 6800
+    },
+    {
+      "text": "Text Overlays",
+      "start": 6800,
+      "end": 8800
+    },
+    {
+      "text": "Smooth",
+      "start": 8800,
+      "end": 10000
+    },
+    {
+      "text": "Animations",
+      "start": 10000,
+      "end": 12000
+    },
+    {
+      "text": "Perfect for",
+      "start": 12000,
+      "end": 13500
+    },
+    {
+      "text": "TikTok & Reels",
+      "start": 13500,
+      "end": 16000
+    }
+  ]
+}
