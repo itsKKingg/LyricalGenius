@@ -87,35 +87,12 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
         <div className="flex flex-col items-end gap-2">
           <Button 
             onClick={onExport}
-            disabled={renderProgress !== null}
             className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all px-6"
           >
-            {renderProgress !== null ? 'Exporting...' : 'Export Project'}
+            Export Project
           </Button>
-          {renderProgress !== null && (
-            <div className="text-xs font-medium text-slate-500 animate-pulse">
-              {renderStatus}
-            </div>
-          )}
         </div>
       </div>
-
-      {renderProgress !== null && (
-        <div className="mb-6 bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
-          <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Rendering Progress</span>
-            <span className="text-sm font-bold text-indigo-600">{renderProgress}%</span>
-          </div>
-          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${renderProgress}%` }}
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
-            />
-          </div>
-          <p className="mt-2 text-xs text-slate-500 text-center italic">{renderStatus}</p>
-        </div>
-      )}
 
       {/* Audio Controls */}
       {audioDuration > 0 && (

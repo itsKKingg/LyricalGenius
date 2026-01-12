@@ -9,6 +9,7 @@ import { SettingsView } from '../../components/editor/tabs/SettingsView';
 import { ContentDraftView } from '../../components/editor/tabs/ContentDraftView';
 import { ScheduleView } from '../../components/editor/tabs/ScheduleView';
 import { VideoPreview } from '../../components/editor/VideoPreview';
+import { RenderingModal } from '../../components/editor/RenderingModal';
 import { User, PenLine, Video, PlaySquare, Settings, LogOut, Moon, Sun } from 'lucide-react';
 import { AppState, Section, LyricWord, ViewType, Aesthetic, MediaAsset } from './types';
 import { generateId } from './utils';
@@ -50,6 +51,8 @@ function App() {
   // Render state
   const [renderProgress, setRenderProgress] = useState<number | null>(null);
   const [renderStatus, setRenderStatus] = useState<string>('');
+  const [renderJobId, setRenderJobId] = useState<string | null>(null);
+  const [showRenderingModal, setShowRenderingModal] = useState(false);
 
   // --- Audio Playback Functions ---
 
@@ -241,9 +244,14 @@ function App() {
   };
 
   const generateProjectJson = () => {
+    // Use actual uploaded media if available, otherwise use sample
+    const selectedMediaUrl = state.selectedMedia?.url || 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4';
+    
     return {
-      selectedMediaUrl: state.selectedMedia?.url || null,
+      background_url: selectedMediaUrl,
+      audio_url: '/tmp/audio.mp3', // Demo audio file
       lyricArray: state.words.length > 0 ? state.words : sampleLyrics,
+      lyrics: state.words.length > 0 ? state.words : sampleLyrics, // Support both formats
       font: state.font || 'Inter',
       color: state.color || '#ffffff',
       animationStyle: state.animationStyle || 'fade'
@@ -254,8 +262,23 @@ function App() {
     const projectJson = generateProjectJson();
     console.log('Project JSON Blueprint:', JSON.stringify(projectJson, null, 2));
     
-    setRenderProgress(0);
-    setRenderStatus('Starting render...');
+    // For demo purposes, we'll simulate a background video file
+    // In a real implementation, this would be the uploaded background video
+    if (projectJson.background_url.includes('sample-videos.com')) {
+      // Download and save the sample video locally for demo
+      try {
+        const response = await fetch(projectJson.background_url);
+        const blob = await response.blob();
+        const formData = new FormData();
+        formData.append('background_video', blob, 'background.mp4');
+        
+        // For demo, we'll use a local path (this would be handled by file upload in real app)
+        projectJson.background_url = '/tmp/background.mp4';
+      } catch (error) {
+        console.log('Demo: Using sample background video path');
+        projectJson.background_url = '/tmp/background.mp4';
+      }
+    }
     
     try {
       const response = await fetch('/api/render', {
@@ -267,35 +290,36 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error('Render request failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Render request failed');
       }
 
       const data = await response.json();
-      console.log('Render response:', data);
+      console.log('Render job started:', data);
 
-      // Simulate progress for UI demonstration
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 10;
-        if (progress > 100) {
-          setRenderProgress(100);
-          setRenderStatus('Render complete!');
-          clearInterval(interval);
-          setTimeout(() => setRenderProgress(null), 3000);
-        } else {
-          setRenderProgress(progress);
-          if (progress < 30) setRenderStatus(`${progress}% - Preparing assets...`);
-          else if (progress < 60) setRenderStatus(`${progress}% - Processing audio...`);
-          else if (progress < 90) setRenderStatus(`${progress}% - Adding Lyrics...`);
-          else setRenderStatus(`${progress}% - Finalizing video...`);
-        }
-      }, 500);
+      // Store job ID and show modal
+      setRenderJobId(data.job_id);
+      setShowRenderingModal(true);
+      
+      // Reset local progress tracking
+      setRenderProgress(null);
+      setRenderStatus('');
 
     } catch (error) {
       console.error('Export failed:', error);
       setRenderStatus('Export failed. Please try again.');
-      setTimeout(() => setRenderProgress(null), 3000);
+      setTimeout(() => setRenderStatus(''), 3000);
     }
+  };
+
+  const handleRenderComplete = (outputPath: string) => {
+    console.log('Render completed:', outputPath);
+    // The modal will handle the download functionality
+  };
+
+  const closeRenderingModal = () => {
+    setShowRenderingModal(false);
+    setRenderJobId(null);
   };
 
   const closeModal = () => setState(prev => ({ ...prev, currentModal: 'NONE' }));
@@ -584,6 +608,14 @@ function App() {
               </div>
           </div>
         )}
+
+        {/* Rendering Modal */}
+        <RenderingModal
+          isOpen={showRenderingModal}
+          jobId={renderJobId}
+          onClose={closeRenderingModal}
+          onComplete={handleRenderComplete}
+        />
       </div>
     </div>
   );
