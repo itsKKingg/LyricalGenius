@@ -41,7 +41,7 @@ def extract_pinterest_media(url):
     except Exception as e:
         raise Exception(f"Failed to extract media: {str(e)}")
 
-@app.route('/', methods=['POST'])
+@app.route('/api/pinterest', methods=['POST'])
 def handle_pinterest_download():
     try:
         data = request.get_json()
@@ -67,4 +67,4 @@ def handle_pinterest_download():
 
 # For local development
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=8000, debug=True)
