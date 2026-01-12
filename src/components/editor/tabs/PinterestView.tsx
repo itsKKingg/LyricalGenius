@@ -31,7 +31,7 @@ export const PinterestView: React.FC<PinterestViewProps> = ({ selectedMedia, onM
     setFetchedMedia([]);
 
     try {
-      const response = await fetch('http://localhost:5000', {
+      const response = await fetch('http://localhost:8000/api/pinterest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

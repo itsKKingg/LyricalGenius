@@ -16,7 +16,30 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Python Backend Setup
+
+The Pinterest bridge requires a Python Flask backend. To run it:
+
+1. Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+2. Start the Python backend server:
+```bash
+python api/index.py
+```
+
+The backend will run on port 8000 at http://localhost:8000
+
+### Prerequisites
+
+- Install `pinterest-dl` for Pinterest media extraction:
+```bash
+pip install pinterest-dl
+```
+
+You can start editing the page by modifying `app/page.tsx`. The app auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
@@ -27,10 +50,8 @@ To learn more about Next.js, take a look at the following resources:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) - your feedback and contributions are welcome!
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Check out the [Next.js deployment documentation](https://nextjs.org/docs) for more details.
