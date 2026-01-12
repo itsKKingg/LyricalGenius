@@ -1,9 +1,9 @@
 import React from 'react';
 import { Play } from 'lucide-react';
-import type { MediaAsset } from '../app/editor/types';
+import type { MediaAsset } from '../../app/editor/types';
 
 interface VideoPreviewProps {
-  selectedMedia: MediaAsset | null;
+  selectedMedia: MediaAsset | null | undefined;
 }
 
 export const VideoPreview: React.FC<VideoPreviewProps> = ({ selectedMedia }) => {

@@ -4,7 +4,7 @@ import { Button } from '../../ui/button';
 import type { MediaAsset } from '../../../app/editor/types';
 
 interface PexelsViewProps {
-  selectedMedia: MediaAsset | null;
+  selectedMedia: MediaAsset | null | undefined;
   onMediaSelect: (media: MediaAsset) => void;
 }
 
@@ -33,6 +33,7 @@ const mockMediaAssets: MediaAsset[] = [
   {
     id: '3',
     url: 'https://images.unsplash.com/photo-1506157786151-b8491531f436?w=400&h=700&fit=crop',
+    thumbnail: 'https://images.unsplash.com/photo-1506157786151-b8491531f436?w=400&h=700&fit=crop',
     type: 'image',
     title: 'Concert Lights'
   }
