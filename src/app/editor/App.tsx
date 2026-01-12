@@ -10,10 +10,11 @@ import { ContentDraftView } from '../../components/editor/tabs/ContentDraftView'
 import { ScheduleView } from '../../components/editor/tabs/ScheduleView';
 import { VideoPreview } from '../../components/editor/VideoPreview';
 import { RenderingModal } from '../../components/editor/RenderingModal';
-import { User, PenLine, Video, PlaySquare, Settings, LogOut, Moon, Sun } from 'lucide-react';
+import { User, PenLine, Video, PlaySquare, Settings, LogOut, Moon, Sun, Check } from 'lucide-react';
 import { AppState, Section, LyricWord, ViewType, Aesthetic, MediaAsset } from './types';
 import { generateId } from './utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { projectPersistenceService, ProjectState } from '../../lib/projectPersistence';
 
 function App() {
   const [state, setState] = useState<AppState>({
@@ -48,6 +49,12 @@ function App() {
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  // Project persistence state
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [isProjectSaved, setIsProjectSaved] = useState(true);
+  const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
+  const [isSavingProject, setIsSavingProject] = useState(false);
+
   // Render state
   const [renderProgress, setRenderProgress] = useState<number | null>(null);
   const [renderStatus, setRenderStatus] = useState<string>('');
@@ -78,6 +85,36 @@ function App() {
       }
     };
   }, [isPlaying]);
+
+  // Project persistence - Auto-save every 30 seconds if state has changed
+  useEffect(() => {
+    const autoSaveInterval = setInterval(async () => {
+      if (!isProjectSaved && !isSavingProject && state.currentView === 'WORKSPACE') {
+        await handleAutoSave();
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(autoSaveInterval);
+  }, [isProjectSaved, isSavingProject, state.currentView]);
+
+  // Project persistence - Save when state changes (debounced)
+  useEffect(() => {
+    if (state.currentView !== 'WORKSPACE') return;
+    
+    const saveTimeout = setTimeout(async () => {
+      await handleAutoSave();
+    }, 2000); // Auto-save 2 seconds after state change
+
+    return () => clearTimeout(saveTimeout);
+  }, [
+    state.selectedMedia?.url, 
+    JSON.stringify(state.words), 
+    state.audioFile?.name, 
+    state.font, 
+    state.color, 
+    state.animationStyle,
+    state.currentView
+  ]);
 
   const playAudio = () => {
     if (audioRef.current) {
@@ -322,6 +359,105 @@ function App() {
     setRenderJobId(null);
   };
 
+  // --- Project Persistence Functions ---
+
+  const handleAutoSave = async () => {
+    if (state.currentView !== 'WORKSPACE') return;
+    
+    setIsSavingProject(true);
+    setIsProjectSaved(false);
+
+    try {
+      const projectState: ProjectState = {
+        title: getActiveAesthetic()?.name || 'Untitled Project',
+        background_url: state.selectedMedia?.url,
+        audio_url: state.audioFile ? URL.createObjectURL(state.audioFile) : undefined,
+        lyrics_json: state.words.length > 0 ? state.words : sampleLyrics,
+        activeTab: state.activeTab,
+        selectedMedia: state.selectedMedia,
+        audioFile: state.audioFile,
+        audioDuration: state.audioDuration,
+        words: state.words,
+        font: state.font,
+        color: state.color,
+        animationStyle: state.animationStyle
+      };
+
+      const result = await projectPersistenceService.saveProject(
+        projectState,
+        currentProjectId || undefined
+      );
+
+      if (result.success) {
+        setIsProjectSaved(true);
+        setLastSaveTime(new Date());
+        if (result.projectId && !currentProjectId) {
+          setCurrentProjectId(result.projectId);
+        }
+      } else {
+        console.error('Auto-save failed:', result.error);
+        setIsProjectSaved(false);
+      }
+    } catch (error) {
+      console.error('Auto-save error:', error);
+      setIsProjectSaved(false);
+    } finally {
+      setIsSavingProject(false);
+    }
+  };
+
+  const handleLoadProject = async (projectId: string) => {
+    setIsSavingProject(true);
+    
+    try {
+      const result = await projectPersistenceService.loadProject(projectId);
+      
+      if (result.success && result.project) {
+        const project = result.project;
+        
+        // Convert project data back to app state
+        const loadedWords = (project.lyrics_json as any[]) || [];
+        
+        setState(prev => ({
+          ...prev,
+          currentView: 'WORKSPACE',
+          activeAestheticId: projectId, // Use projectId as aestheticId for consistency
+          selectedMedia: project.background_url ? {
+            id: generateId(),
+            url: project.background_url,
+            type: 'video'
+          } : null,
+          words: loadedWords,
+          font: state.font,
+          color: state.color,
+          animationStyle: state.animationStyle
+        }));
+
+        // Update project persistence state
+        setCurrentProjectId(projectId);
+        setIsProjectSaved(true);
+        setLastSaveTime(new Date(project.last_edited));
+        
+        console.log('Project loaded successfully');
+      } else {
+        console.error('Failed to load project:', result.error);
+        alert('Failed to load project. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error loading project:', error);
+      alert('Failed to load project. Please try again.');
+    } finally {
+      setIsSavingProject(false);
+    }
+  };
+
+  // Cleanup project persistence on unmount
+  useEffect(() => {
+    return () => {
+      projectPersistenceService.cleanup();
+    };
+  }, []);
+
   const closeModal = () => setState(prev => ({ ...prev, currentModal: 'NONE' }));
 
   // --- View Rendering ---
@@ -332,7 +468,8 @@ function App() {
         return (
           <HomeView 
             onCreate={handleCreateAesthetic} 
-            onViewAesthetics={() => handleNavigate('AESTHETICS')} 
+            onViewAesthetics={() => handleNavigate('AESTHETICS')}
+            onLoadProject={handleLoadProject}
           />
         );
       
@@ -475,74 +612,103 @@ function App() {
               but for consistency with design, those views have specific full-width headers. 
               We'll conditionally render this generic header. */}
           {['HOME', 'AESTHETICS', 'WORKSPACE', 'PEXELS', 'PINTEREST', 'TEXT_EDITOR', 'SETTINGS'].includes(state.currentView) && (
-             <div className="h-16 flex items-center justify-end px-8 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-[#111318]/50 backdrop-blur-sm sticky top-0 z-30 transition-colors">
-            {state.currentView === 'WORKSPACE' && (
-              <motion.button 
-                  onClick={() => openCreateModal('video')}
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    boxShadow: [
-                      "0px 0px 0px rgba(59, 130, 246, 0)",
-                      "0px 0px 20px rgba(59, 130, 246, 0.5)",
-                      "0px 0px 0px rgba(59, 130, 246, 0)"
-                    ]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="flex items-center gap-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-full shadow-sm transition-all mr-4"
-              >
-                  Next step: create some content
-                  <span className="bg-white/20 rounded-full p-0.5"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></span>
-              </motion.button>
-            )}
-            
-            <div className="relative">
-                <button 
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className={`p-2 rounded-full transition-colors ${isProfileOpen ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50 dark:hover:text-white dark:hover:bg-gray-800'}`}
-                >
-                    <User size={20} />
-                </button>
+             <div className="h-16 flex items-center justify-between px-8 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-[#111318]/50 backdrop-blur-sm sticky top-0 z-30 transition-colors">
+              
+              {/* Project Save Status */}
+              {state.currentView === 'WORKSPACE' && (
+                <div className="flex items-center gap-2">
+                  {isSavingProject ? (
+                    <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      Saving...
+                    </div>
+                  ) : isProjectSaved ? (
+                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                      <Check size={16} />
+                      <span>Saved</span>
+                      {lastSaveTime && (
+                        <span className="text-gray-400 dark:text-gray-500">
+                          {lastSaveTime.toLocaleTimeString()}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                      Unsaved changes
+                    </div>
+                  )}
+                </div>
+              )}
 
-                {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#1A1D23] rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-fade-in origin-top-right">
-                      <div className="px-5 py-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50/50 dark:bg-black/20">
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white">My Account</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">demo@lyricalgenius.com</p>
-                      </div>
-                      <div className="p-2 space-y-1">
-                          <button 
-                              onClick={toggleTheme}
-                              className="flex w-full items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                          >
-                              <div className="flex items-center gap-3">
-                                {state.theme === 'dark' ? <Moon size={16} className="text-gray-400"/> : <Sun size={16} className="text-gray-400"/>}
-                                Theme
-                              </div>
-                              <span className="text-xs text-gray-400 capitalize">{state.theme}</span>
-                          </button>
-                          <button 
-                              onClick={() => { handleNavigate('SETTINGS'); setIsProfileOpen(false); }}
-                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                          >
-                              <Settings size={16} className="text-gray-400"/>
-                              Settings
-                          </button>
-                          <button 
-                              onClick={() => { alert('Sign out clicked'); setIsProfileOpen(false); }}
-                              className="flex w-full items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
-                          >
-                              <LogOut size={16} className="text-red-400 group-hover:text-red-600"/>
-                              Sign Out
-                          </button>
-                      </div>
-                  </div>
+              <div className="flex items-center gap-4">
+                {state.currentView === 'WORKSPACE' && (
+                  <motion.button 
+                      onClick={() => openCreateModal('video')}
+                      animate={{
+                        scale: [1, 1.05, 1],
+                        boxShadow: [
+                          "0px 0px 0px rgba(59, 130, 246, 0)",
+                          "0px 0px 20px rgba(59, 130, 246, 0.5)",
+                          "0px 0px 0px rgba(59, 130, 246, 0)"
+                        ]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="flex items-center gap-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-full shadow-sm transition-all mr-4"
+                  >
+                      Next step: create some content
+                      <span className="bg-white/20 rounded-full p-0.5"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></span>
+                  </motion.button>
                 )}
-            </div>
-          </div>
+            
+                <div className="relative">
+                    <button 
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className={`p-2 rounded-full transition-colors ${isProfileOpen ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50 dark:hover:text-white dark:hover:bg-gray-800'}`}
+                  >
+                        <User size={20} />
+                    </button>
+
+                    {isProfileOpen && (
+                      <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#1A1D23] rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden animate-fade-in origin-top-right">
+                          <div className="px-5 py-4 border-b border-gray-50 dark:border-gray-700 bg-gray-50/50 dark:bg-black/20">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white">My Account</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">demo@lyricalgenius.com</p>
+                          </div>
+                          <div className="p-2 space-y-1">
+                              <button 
+                                  onClick={toggleTheme}
+                                  className="flex w-full items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                              >
+                                  <div className="flex items-center gap-3">
+                                    {state.theme === 'dark' ? <Moon size={16} className="text-gray-400"/> : <Sun size={16} className="text-gray-400"/>}
+                                    Theme
+                                  </div>
+                                  <span className="text-xs text-gray-400 capitalize">{state.theme}</span>
+                              </button>
+                              <button 
+                                  onClick={() => { handleNavigate('SETTINGS'); setIsProfileOpen(false); }}
+                                  className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                              >
+                                  <Settings size={16} className="text-gray-400"/>
+                                  Settings
+                              </button>
+                              <button 
+                                  onClick={() => { alert('Sign out clicked'); setIsProfileOpen(false); }}
+                                  className="flex w-full items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
+                              >
+                                  <LogOut size={16} className="text-red-400 group-hover:text-red-600"/>
+                                  Sign Out
+                              </button>
+                          </div>
+                      </div>
+                    )}
+                </div>
+              </div>
           )}
 
           <AnimatePresence mode="wait">
