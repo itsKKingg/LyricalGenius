@@ -3,6 +3,7 @@ import { Film, Download, Loader2 } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import type { MediaAsset } from '../../../app/editor/types';
+import { motion } from 'framer-motion';
 
 interface PinterestViewProps {
   selectedMedia: MediaAsset | null | undefined;
@@ -65,7 +66,11 @@ export const PinterestView: React.FC<PinterestViewProps> = ({ selectedMedia, onM
   };
 
   return (
-    <div className="animate-fade-in">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }} 
+      animate={{ opacity: 1, x: 0 }}
+      className="animate-fade-in"
+    >
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Pinterest Bridge</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400">Fetch media from Pinterest URLs</p>
@@ -114,9 +119,10 @@ export const PinterestView: React.FC<PinterestViewProps> = ({ selectedMedia, onM
       ) : fetchedMedia.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {fetchedMedia.map((media) => (
-            <div
+            <motion.div
               key={media.id}
               onClick={() => onMediaSelect(media)}
+              whileHover={{ scale: 1.05 }}
               className={`
                 relative aspect-[9/16] rounded-lg overflow-hidden cursor-pointer transition-all
                 hover:ring-2 hover:ring-indigo-500 hover:shadow-lg
@@ -145,7 +151,7 @@ export const PinterestView: React.FC<PinterestViewProps> = ({ selectedMedia, onM
                   </div>
                 </div>
               )}
-            </div>
+            </motion.div>
           ))}
         </div>
       ) : !isLoading && (
@@ -157,6 +163,6 @@ export const PinterestView: React.FC<PinterestViewProps> = ({ selectedMedia, onM
            <p className="text-sm text-slate-500 dark:text-slate-400">Enter a Pinterest URL to fetch media</p>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };

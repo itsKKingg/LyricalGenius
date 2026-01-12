@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Video, Image as ImageIcon, Music, RefreshCw, QrCode, Volume2 } from 'lucide-react';
 import { Button } from '../../ui/button';
 import type { MediaAsset } from '../../../app/editor/types';
+import { motion } from 'framer-motion';
 
 interface PexelsViewProps {
   selectedMedia: MediaAsset | null | undefined;
@@ -126,7 +127,11 @@ const MediaSection: React.FC<MediaSectionProps> = ({
 
 export const PexelsView: React.FC<PexelsViewProps> = ({ selectedMedia, onMediaSelect }) => {
   return (
-    <div className="animate-fade-in">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }} 
+      animate={{ opacity: 1, x: 0 }}
+      className="animate-fade-in"
+    >
       {/* Media Grid Section */}
       <div className="mb-8">
         <div className="mb-6">
@@ -141,9 +146,10 @@ export const PexelsView: React.FC<PexelsViewProps> = ({ selectedMedia, onMediaSe
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Available Media</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {mockMediaAssets.map((media) => (
-              <div
+              <motion.div
                 key={media.id}
                 onClick={() => onMediaSelect(media)}
+                whileHover={{ scale: 1.05 }}
                 className={`
                   relative aspect-[9/16] rounded-lg overflow-hidden cursor-pointer transition-all
                   hover:ring-2 hover:ring-indigo-500 hover:shadow-lg
@@ -158,7 +164,7 @@ export const PexelsView: React.FC<PexelsViewProps> = ({ selectedMedia, onMediaSe
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
                   <p className="text-white text-xs font-medium truncate">{media.title}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -214,6 +220,6 @@ export const PexelsView: React.FC<PexelsViewProps> = ({ selectedMedia, onMediaSe
               ))}
           </MediaSection>
       </div>
-    </div>
+    </motion.div>
   );
 };

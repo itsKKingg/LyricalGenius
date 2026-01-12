@@ -1,7 +1,12 @@
 "use client";
 
 import App from './App';
+import { AnimatePresence } from 'framer-motion';
 
 export default function EditorPage() {
-  return <App />;
+  return (
+    <AnimatePresence mode="wait">
+      <App />
+    </AnimatePresence>
+  );
 }

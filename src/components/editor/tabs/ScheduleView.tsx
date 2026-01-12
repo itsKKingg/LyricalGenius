@@ -1,12 +1,17 @@
 import React from 'react';
 import { Plus, Bell, Settings, Type, List, ExternalLink, ChevronDown } from 'lucide-react';
 import { Button } from '../../ui/button';
+import { motion } from 'framer-motion';
 
 export const ScheduleView: React.FC = () => {
   const days = ['Sun Jan 11', 'Mon Jan 12', 'Tue Jan 13', 'Wed Jan 14', 'Thu Jan 15', 'Fri Jan 16', 'Sat Jan 17'];
 
   return (
-    <div className="flex flex-col h-screen animate-fade-in bg-white dark:bg-workspaceDark">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }} 
+      animate={{ opacity: 1, x: 0 }}
+      className="flex flex-col h-screen animate-fade-in bg-white dark:bg-workspaceDark"
+    >
        {/* Top Bar */}
       <div className="h-16 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-8 shrink-0">
           <div className="flex items-center gap-2">
@@ -104,6 +109,6 @@ export const ScheduleView: React.FC = () => {
              <span className="opacity-80">Drag and drop approved edits from the left into a day to create posts - or select multiple videos / slideshows and try the scheduler!</span>
          </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

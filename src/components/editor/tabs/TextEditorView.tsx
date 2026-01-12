@@ -3,6 +3,7 @@ import { Scissors, Type, Image as ImageIcon, Play, Pause } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import type { MediaAsset, LyricWord } from '../../../app/editor/types';
+import { motion } from 'framer-motion';
 
 interface TextEditorViewProps {
   selectedMedia: MediaAsset | null | undefined;
@@ -67,7 +68,11 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
   };
 
   return (
-    <div className="animate-fade-in">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }} 
+      animate={{ opacity: 1, x: 0 }}
+      className="animate-fade-in"
+    >
       <div className="mb-6">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Audio Lyrics Sync</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400">Synchronize lyrics with audio playback for precise timing</p>
@@ -235,6 +240,6 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };

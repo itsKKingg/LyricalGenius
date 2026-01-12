@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, FolderOpen } from 'lucide-react';
 import { Aesthetic } from '../../../app/editor/types';
+import { motion } from 'framer-motion';
 
 interface AestheticsListViewProps {
   aesthetics: Aesthetic[];
@@ -10,7 +11,11 @@ interface AestheticsListViewProps {
 
 export const AestheticsListView: React.FC<AestheticsListViewProps> = ({ aesthetics, onCreate, onSelect }) => {
   return (
-    <div className="max-w-[1600px] mx-auto py-8">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }} 
+      animate={{ opacity: 1, x: 0 }}
+      className="max-w-[1600px] mx-auto py-8"
+    >
       <div className="flex items-center justify-between mb-8">
         <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Your Aesthetics</h1>
@@ -77,6 +82,6 @@ export const AestheticsListView: React.FC<AestheticsListViewProps> = ({ aestheti
             </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
