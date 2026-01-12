@@ -87,6 +87,38 @@ export interface Database {
           created_at?: string
         }
       }
+      editor_projects: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          background_url: string | null
+          audio_url: string | null
+          lyrics_json: Json | null
+          last_edited: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title?: string
+          background_url?: string | null
+          audio_url?: string | null
+          lyrics_json?: Json | null
+          last_edited?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          background_url?: string | null
+          audio_url?: string | null
+          lyrics_json?: Json | null
+          last_edited?: string
+          created_at?: string
+        }
+      }
       aesthetics: {
         Row: {
           id: string
