@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Video, Image as ImageIcon, Music, RefreshCw, QrCode, Volume2 } from 'lucide-react';
 import { Button } from '../../ui/button';
-import type { MediaAsset } from '../../app/editor/types';
+import type { MediaAsset } from '../../../app/editor/types';
 
 interface PexelsViewProps {
   selectedMedia: MediaAsset | null;
