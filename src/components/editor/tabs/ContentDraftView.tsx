@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, PenLine, LayoutGrid, ChevronDown } from 'lucide-react';
 import { Button } from '../../ui/button';
+import { motion } from 'framer-motion';
 
 interface ContentDraftViewProps {
   type: 'video' | 'slideshow';
@@ -14,7 +15,11 @@ export const ContentDraftView: React.FC<ContentDraftViewProps> = ({
   onCreateClick 
 }) => {
   return (
-    <div className="flex flex-col h-screen animate-fade-in relative">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }} 
+      animate={{ opacity: 1, x: 0 }}
+      className="flex flex-col h-screen animate-fade-in relative"
+    >
       {/* Top Bar */}
       <div className="h-16 border-b border-slate-100 bg-white dark:bg-workspaceDark dark:border-slate-800 flex items-center justify-between px-8 shrink-0">
           <div className="flex items-center gap-2">
@@ -94,6 +99,6 @@ export const ContentDraftView: React.FC<ContentDraftViewProps> = ({
              </div>
          </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

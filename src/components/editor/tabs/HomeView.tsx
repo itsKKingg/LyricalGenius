@@ -1,10 +1,15 @@
 import React from 'react';
 import { Button } from '../../ui/button';
 import { Plus, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const HomeView: React.FC<{ onCreate: () => void, onViewAesthetics: () => void }> = ({ onCreate, onViewAesthetics }) => {
   return (
-    <div className="max-w-4xl mx-auto py-12 px-6">
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }} 
+      animate={{ opacity: 1, x: 0 }}
+      className="max-w-4xl mx-auto py-12 px-6"
+    >
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">Welcome to LyricalGenius</h1>
         <p className="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
@@ -32,6 +37,6 @@ export const HomeView: React.FC<{ onCreate: () => void, onViewAesthetics: () => 
             <Button variant="secondary" onClick={onViewAesthetics} className="w-full dark:bg-transparent dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">View All</Button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

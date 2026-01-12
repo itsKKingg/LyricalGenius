@@ -13,6 +13,7 @@ import {
   Plus
 } from 'lucide-react';
 import { ViewType, Aesthetic } from '../../app/editor/types';
+import { motion } from 'framer-motion';
 
 interface SidebarProps {
   currentView: ViewType;

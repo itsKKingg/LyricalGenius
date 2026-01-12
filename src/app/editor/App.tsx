@@ -12,6 +12,7 @@ import { VideoPreview } from '../../components/editor/VideoPreview';
 import { User, PenLine, Video, PlaySquare, Settings, LogOut, Moon, Sun } from 'lucide-react';
 import { AppState, Section, LyricWord, ViewType, Aesthetic, MediaAsset } from './types';
 import { generateId } from './utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
   const [state, setState] = useState<AppState>({
@@ -381,13 +382,26 @@ function App() {
           {['HOME', 'AESTHETICS', 'WORKSPACE', 'PEXELS', 'PINTEREST', 'TEXT_EDITOR', 'SETTINGS'].includes(state.currentView) && (
              <div className="h-16 flex items-center justify-end px-8 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-[#111318]/50 backdrop-blur-sm sticky top-0 z-30 transition-colors">
             {state.currentView === 'WORKSPACE' && (
-              <button 
+              <motion.button 
                   onClick={() => openCreateModal('video')}
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    boxShadow: [
+                      "0px 0px 0px rgba(59, 130, 246, 0)",
+                      "0px 0px 20px rgba(59, 130, 246, 0.5)",
+                      "0px 0px 0px rgba(59, 130, 246, 0)"
+                    ]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
                   className="flex items-center gap-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-full shadow-sm transition-all mr-4"
               >
                   Next step: create some content
                   <span className="bg-white/20 rounded-full p-0.5"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></span>
-              </button>
+              </motion.button>
             )}
             
             <div className="relative">
@@ -436,7 +450,18 @@ function App() {
           </div>
           )}
 
-          {renderContent()}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={state.currentView + (state.currentView === 'WORKSPACE' ? state.activeTab : '')}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="flex-1 flex flex-col"
+            >
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
 
           {/* Bottom Persistent Action Bar - Only in Workspace */}
           {state.currentView === 'WORKSPACE' && (
