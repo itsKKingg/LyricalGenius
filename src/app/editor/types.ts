@@ -58,6 +58,9 @@ export interface AppState {
   createContentType?: 'video' | 'slideshow';
   activeTab?: 'editor' | 'pexels' | 'pinterest';
   selectedMedia: MediaAsset | null | undefined;
+  font?: string;
+  color?: string;
+  animationStyle?: string;
 }
 
 export type ModalType = 

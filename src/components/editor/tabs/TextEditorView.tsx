@@ -15,6 +15,9 @@ interface TextEditorViewProps {
   onPause: () => void;
   onSeek: (timeMs: number) => void;
   audioDuration: number;
+  onExport: () => void;
+  renderProgress: number | null;
+  renderStatus: string;
 }
 
 export const TextEditorView: React.FC<TextEditorViewProps> = ({ 
@@ -26,7 +29,10 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
   onPlay, 
   onPause, 
   onSeek, 
-  audioDuration 
+  audioDuration,
+  onExport,
+  renderProgress,
+  renderStatus
 }) => {
   const [text, setText] = useState('');
   const lyricsContainerRef = useRef<HTMLDivElement>(null);
@@ -73,10 +79,43 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
       animate={{ opacity: 1, x: 0 }}
       className="animate-fade-in"
     >
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Audio Lyrics Sync</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Synchronize lyrics with audio playback for precise timing</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Audio Lyrics Sync</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Synchronize lyrics with audio playback for precise timing</p>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          <Button 
+            onClick={onExport}
+            disabled={renderProgress !== null}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all px-6"
+          >
+            {renderProgress !== null ? 'Exporting...' : 'Export Project'}
+          </Button>
+          {renderProgress !== null && (
+            <div className="text-xs font-medium text-slate-500 animate-pulse">
+              {renderStatus}
+            </div>
+          )}
+        </div>
       </div>
+
+      {renderProgress !== null && (
+        <div className="mb-6 bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Rendering Progress</span>
+            <span className="text-sm font-bold text-indigo-600">{renderProgress}%</span>
+          </div>
+          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${renderProgress}%` }}
+              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+            />
+          </div>
+          <p className="mt-2 text-xs text-slate-500 text-center italic">{renderStatus}</p>
+        </div>
+      )}
 
       {/* Audio Controls */}
       {audioDuration > 0 && (

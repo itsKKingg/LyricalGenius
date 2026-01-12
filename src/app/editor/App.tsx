@@ -33,7 +33,10 @@ function App() {
     sections: [],
     words: [],
     videos: [],
-    photos: []
+    photos: [],
+    font: 'Inter',
+    color: '#ffffff',
+    animationStyle: 'fade'
   });
 
   // Audio playback state
@@ -43,6 +46,10 @@ function App() {
   const animationFrameRef = useRef<number | null>(null);
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Render state
+  const [renderProgress, setRenderProgress] = useState<number | null>(null);
+  const [renderStatus, setRenderStatus] = useState<string>('');
 
   // --- Audio Playback Functions ---
 
@@ -233,6 +240,64 @@ function App() {
       setState(prev => ({ ...prev, currentModal: 'CREATE_CONTENT', createContentType: type }));
   };
 
+  const generateProjectJson = () => {
+    return {
+      selectedMediaUrl: state.selectedMedia?.url || null,
+      lyricArray: state.words.length > 0 ? state.words : sampleLyrics,
+      font: state.font || 'Inter',
+      color: state.color || '#ffffff',
+      animationStyle: state.animationStyle || 'fade'
+    };
+  };
+
+  const handleExport = async () => {
+    const projectJson = generateProjectJson();
+    console.log('Project JSON Blueprint:', JSON.stringify(projectJson, null, 2));
+    
+    setRenderProgress(0);
+    setRenderStatus('Starting render...');
+    
+    try {
+      const response = await fetch('/api/render', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectJson),
+      });
+
+      if (!response.ok) {
+        throw new Error('Render request failed');
+      }
+
+      const data = await response.json();
+      console.log('Render response:', data);
+
+      // Simulate progress for UI demonstration
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        if (progress > 100) {
+          setRenderProgress(100);
+          setRenderStatus('Render complete!');
+          clearInterval(interval);
+          setTimeout(() => setRenderProgress(null), 3000);
+        } else {
+          setRenderProgress(progress);
+          if (progress < 30) setRenderStatus(`${progress}% - Preparing assets...`);
+          else if (progress < 60) setRenderStatus(`${progress}% - Processing audio...`);
+          else if (progress < 90) setRenderStatus(`${progress}% - Adding Lyrics...`);
+          else setRenderStatus(`${progress}% - Finalizing video...`);
+        }
+      }, 500);
+
+    } catch (error) {
+      console.error('Export failed:', error);
+      setRenderStatus('Export failed. Please try again.');
+      setTimeout(() => setRenderProgress(null), 3000);
+    }
+  };
+
   const closeModal = () => setState(prev => ({ ...prev, currentModal: 'NONE' }));
 
   // --- View Rendering ---
@@ -295,9 +360,12 @@ function App() {
                   onPause={pauseAudio}
                   onSeek={seekAudio}
                   audioDuration={state.audioDuration}
-                />
-              )}
-            </div>
+                  onExport={handleExport}
+                  renderProgress={renderProgress}
+                  renderStatus={renderStatus}
+                  />
+                  )}
+
           </div>
         );
 
@@ -350,8 +418,11 @@ function App() {
             onPause={pauseAudio}
             onSeek={seekAudio}
             audioDuration={state.audioDuration}
-          />
-        );
+            onExport={handleExport}
+            renderProgress={renderProgress}
+            renderStatus={renderStatus}
+            />
+            );
 
       case 'SETTINGS':
         return <SettingsView currentTheme={state.theme} onToggleTheme={toggleTheme} />;
