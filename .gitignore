@@ -39,3 +39,20 @@ next-env.d.ts
 .branches
 .temp
 .config
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Whisper model cache
+~/.cache/whisper/
