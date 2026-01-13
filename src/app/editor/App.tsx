@@ -261,6 +261,11 @@ function App() {
       setState(prev => ({ ...prev, words: newWords, currentModal: 'NONE' }));
   };
 
+  const handleLyricsUpdate = (newLyrics: LyricWord[]) => {
+      setState(prev => ({ ...prev, words: newLyrics }));
+      setIsProjectSaved(false); // Mark project as unsaved
+  };
+
   // Sample lyrics for testing - in real app this would come from word timing analysis
   const sampleLyrics: LyricWord[] = [
     { text: "Hello", start: 0, end: 800 },
@@ -373,7 +378,7 @@ function App() {
         background_url: state.selectedMedia?.url,
         audio_url: state.audioFile ? URL.createObjectURL(state.audioFile) : undefined,
         lyrics_json: state.words.length > 0 ? state.words : sampleLyrics,
-        activeTab: state.activeTab,
+        activeTab: state.activeTab || 'editor',
         selectedMedia: state.selectedMedia,
         audioFile: state.audioFile,
         audioDuration: state.audioDuration,
@@ -425,12 +430,12 @@ function App() {
           selectedMedia: project.background_url ? {
             id: generateId(),
             url: project.background_url,
-            type: 'video'
+            type: 'video' as const
           } : null,
           words: loadedWords,
-          font: state.font,
-          color: state.color,
-          animationStyle: state.animationStyle
+          font: prev.font,
+          color: prev.color,
+          animationStyle: prev.animationStyle
         }));
 
         // Update project persistence state
@@ -514,7 +519,7 @@ function App() {
                 <TextEditorView
                   selectedMedia={state.selectedMedia}
                   onMediaSelect={handleMediaSelect}
-                  lyrics={sampleLyrics}
+                  lyrics={state.words.length > 0 ? state.words : sampleLyrics}
                   currentTime={currentTime}
                   isPlaying={isPlaying}
                   onPlay={playAudio}
@@ -524,9 +529,11 @@ function App() {
                   onExport={handleExport}
                   renderProgress={renderProgress}
                   renderStatus={renderStatus}
-                  />
-                  )}
-
+                  onLyricsUpdate={handleLyricsUpdate}
+                  audioFile={state.audioFile}
+                />
+              )}
+            </div>
           </div>
         );
 
@@ -572,7 +579,7 @@ function App() {
           <TextEditorView
             selectedMedia={state.selectedMedia}
             onMediaSelect={handleMediaSelect}
-            lyrics={sampleLyrics}
+            lyrics={state.words.length > 0 ? state.words : sampleLyrics}
             currentTime={currentTime}
             isPlaying={isPlaying}
             onPlay={playAudio}
@@ -582,6 +589,8 @@ function App() {
             onExport={handleExport}
             renderProgress={renderProgress}
             renderStatus={renderStatus}
+            onLyricsUpdate={handleLyricsUpdate}
+            audioFile={state.audioFile}
             />
             );
 
@@ -709,6 +718,7 @@ function App() {
                     )}
                 </div>
               </div>
+            </div>
           )}
 
           <AnimatePresence mode="wait">

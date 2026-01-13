@@ -3,3 +3,6 @@ flask
 flask-cors
 moviepy
 imageio-ffmpeg
+openai-whisper
+torch
+torchaudio

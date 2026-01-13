@@ -8,6 +8,7 @@ import uuid
 import threading
 from datetime import datetime
 from enum import Enum
+import whisper
 
 # Import render engine
 from render_engine import render_video_from_config
@@ -285,6 +286,91 @@ def download_video(job_id):
     
     from flask import send_file
     return send_file(output_path, as_attachment=True, download_name=f'lyric_video_{job_id}.mp4')
+
+
+@app.route('/api/transcribe', methods=['POST'])
+def handle_transcription():
+    """
+    Transcribe audio file and return word-level timestamps using OpenAI Whisper
+    
+    Expected: multipart/form-data with 'audio' file field
+    
+    Returns:
+    {
+        "success": true,
+        "lyrics": [
+            {"text": "Hello", "start": 0, "end": 800},
+            {"text": "world", "start": 800, "end": 1600}
+        ],
+        "duration": 10.5,
+        "language": "en"
+    }
+    """
+    try:
+        # Check if audio file is present
+        if 'audio' not in request.files:
+            return jsonify({'error': 'No audio file provided'}), 400
+        
+        audio_file = request.files['audio']
+        
+        if audio_file.filename == '':
+            return jsonify({'error': 'Empty filename'}), 400
+        
+        # Save uploaded file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_audio:
+            audio_file.save(temp_audio.name)
+            temp_audio_path = temp_audio.name
+        
+        try:
+            # Load Whisper model (base model for balance of speed and accuracy)
+            # You can use 'tiny', 'base', 'small', 'medium', 'large' based on needs
+            print('Loading Whisper model...')
+            model = whisper.load_model("base")
+            
+            # Transcribe with word-level timestamps
+            print(f'Transcribing audio file: {temp_audio_path}')
+            result = model.transcribe(
+                temp_audio_path,
+                word_timestamps=True,
+                verbose=False
+            )
+            
+            # Extract word-level timestamps
+            lyrics = []
+            
+            for segment in result.get('segments', []):
+                for word_info in segment.get('words', []):
+                    lyrics.append({
+                        'text': word_info['word'].strip(),
+                        'start': int(word_info['start'] * 1000),  # Convert to milliseconds
+                        'end': int(word_info['end'] * 1000)       # Convert to milliseconds
+                    })
+            
+            # Clean up temporary file
+            os.unlink(temp_audio_path)
+            
+            if len(lyrics) == 0:
+                return jsonify({
+                    'error': 'No words detected in audio. Please ensure the audio contains speech.'
+                }), 400
+            
+            return jsonify({
+                'success': True,
+                'lyrics': lyrics,
+                'duration': result.get('segments', [{}])[-1].get('end', 0) if result.get('segments') else 0,
+                'language': result.get('language', 'unknown'),
+                'text': result.get('text', '')
+            })
+            
+        except Exception as e:
+            # Clean up on error
+            if os.path.exists(temp_audio_path):
+                os.unlink(temp_audio_path)
+            raise e
+            
+    except Exception as e:
+        print(f'Transcription error: {str(e)}')
+        return jsonify({'error': f'Transcription failed: {str(e)}'}), 500
 
 
 # For local development

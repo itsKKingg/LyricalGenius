@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Scissors, Type, Image as ImageIcon, Play, Pause } from 'lucide-react';
+import { Scissors, Type, Image as ImageIcon, Play, Pause, Sparkles, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import type { MediaAsset, LyricWord } from '../../../app/editor/types';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TextEditorViewProps {
   selectedMedia: MediaAsset | null | undefined;
@@ -18,6 +18,8 @@ interface TextEditorViewProps {
   onExport: () => void;
   renderProgress: number | null;
   renderStatus: string;
+  onLyricsUpdate: (lyrics: LyricWord[]) => void;
+  audioFile: File | null;
 }
 
 export const TextEditorView: React.FC<TextEditorViewProps> = ({ 
@@ -32,11 +34,18 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
   audioDuration,
   onExport,
   renderProgress,
-  renderStatus
+  renderStatus,
+  onLyricsUpdate,
+  audioFile
 }) => {
   const [text, setText] = useState('');
   const lyricsContainerRef = useRef<HTMLDivElement>(null);
   const activeWordRef = useRef<HTMLSpanElement>(null);
+  
+  // AI Transcription state
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcriptionComplete, setTranscriptionComplete] = useState(false);
+  const [transcriptionError, setTranscriptionError] = useState<string | null>(null);
 
   // Find the current active word based on currentTime
   const getActiveWordIndex = () => {
@@ -73,6 +82,53 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  // AI Transcription handler
+  const handleAutoSync = async () => {
+    if (!audioFile) {
+      setTranscriptionError('Please upload an audio file first');
+      setTimeout(() => setTranscriptionError(null), 3000);
+      return;
+    }
+
+    setIsTranscribing(true);
+    setTranscriptionError(null);
+    setTranscriptionComplete(false);
+
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioFile);
+
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Transcription failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.lyrics) {
+        // Update lyrics with AI-generated timestamps
+        onLyricsUpdate(data.lyrics);
+        setTranscriptionComplete(true);
+        
+        // Reset success indicator after 3 seconds
+        setTimeout(() => setTranscriptionComplete(false), 3000);
+      } else {
+        throw new Error('Invalid response from transcription service');
+      }
+    } catch (error) {
+      console.error('Transcription error:', error);
+      setTranscriptionError(error instanceof Error ? error.message : 'Failed to transcribe audio');
+      setTimeout(() => setTranscriptionError(null), 5000);
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, x: 20 }} 
@@ -85,12 +141,46 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
           <p className="text-sm text-slate-500 dark:text-slate-400">Synchronize lyrics with audio playback for precise timing</p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <Button 
-            onClick={onExport}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all px-6"
-          >
-            Export Project
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleAutoSync}
+              disabled={isTranscribing || !audioFile}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isTranscribing ? (
+                <>
+                  <Loader2 size={18} className="mr-2 animate-spin" />
+                  Listening...
+                </>
+              ) : transcriptionComplete ? (
+                <>
+                  <CheckCircle size={18} className="mr-2" />
+                  Synced!
+                </>
+              ) : (
+                <>
+                  <Sparkles size={18} className="mr-2" />
+                  Auto-Sync with AI
+                </>
+              )}
+            </Button>
+            <Button 
+              onClick={onExport}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all px-6"
+            >
+              Export Project
+            </Button>
+          </div>
+          {transcriptionError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded"
+            >
+              {transcriptionError}
+            </motion.div>
+          )}
         </div>
       </div>
 
@@ -134,9 +224,21 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
 
       {/* Synchronized Lyrics Display */}
       <div className="bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 rounded-xl p-6 mb-6 shadow-sm">
-        <div className="flex items-center gap-3 mb-4">
-          <Type size={20} className="text-indigo-600 dark:text-indigo-400" />
-          <h3 className="font-semibold text-slate-900 dark:text-white">Lyrics Timeline</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Type size={20} className="text-indigo-600 dark:text-indigo-400" />
+            <h3 className="font-semibold text-slate-900 dark:text-white">Lyrics Timeline</h3>
+          </div>
+          {lyrics.length > 0 && transcriptionComplete && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full"
+            >
+              <Sparkles size={14} />
+              <span>AI Synced</span>
+            </motion.div>
+          )}
         </div>
 
         {lyrics.length > 0 ? (
