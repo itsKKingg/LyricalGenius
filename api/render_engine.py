@@ -9,6 +9,65 @@ import tempfile
 import time
 from typing import Dict, List, Optional
 import random
+from supabase import create_client, Client
+
+# Initialize Supabase client
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
+supabase_client: Optional[Client] = None
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception as e:
+        print(f"Failed to initialize Supabase client: {e}")
+
+def upload_video_to_supabase(file_path: str, project_id: str) -> Optional[str]:
+    """
+    Upload rendered video to Supabase Storage and update project record
+    """
+    if not supabase_client:
+        print("Supabase client not initialized. Skipping upload.")
+        return None
+    
+    if not project_id:
+        print("No project_id provided. Skipping upload.")
+        return None
+
+    file_name = f"{project_id}_{int(time.time())}.mp4"
+    storage_path = f"{file_name}"
+    
+    try:
+        print(f"Uploading {file_path} to Supabase storage: generated-videos/{storage_path}")
+        with open(file_path, 'rb') as f:
+            supabase_client.storage.from_('generated-videos').upload(
+                path=storage_path,
+                file=f,
+                file_options={"content-type": "video/mp4"}
+            )
+        
+        # Get public URL
+        public_url = supabase_client.storage.from_('generated-videos').get_public_url(storage_path)
+        print(f"Upload successful. Public URL: {public_url}")
+        
+        # Update database - try editor_projects first as it's used by the current editor
+        print(f"Updating project {project_id} in database...")
+        try:
+            supabase_client.table('editor_projects').update({
+                'video_url': public_url,
+                'status': 'completed'
+            }).eq('id', project_id).execute()
+        except Exception as db_e:
+            print(f"Failed to update editor_projects, trying projects table: {db_e}")
+            supabase_client.table('projects').update({
+                'video_url': public_url,
+                'status': 'completed'
+            }).eq('id', project_id).execute()
+        
+        return public_url
+    except Exception as e:
+        print(f"Error in upload_video_to_supabase: {e}")
+        return None
 
 def simulate_render_process(project_config: dict, output_path: str) -> str:
     """
@@ -43,7 +102,14 @@ def render_video_from_config(project_config: Dict, output_path: Optional[str] = 
         temp_dir = tempfile.gettempdir()
         output_path = os.path.join(temp_dir, f"mock_lyric_video_{int(time.time())}.mp4")
     
-    return simulate_render_process(project_config, output_path)
+    rendered_path = simulate_render_process(project_config, output_path)
+    
+    # Upload to Supabase if project_id is present
+    project_id = project_config.get('project_id')
+    if project_id:
+        upload_video_to_supabase(rendered_path, project_id)
+        
+    return rendered_path
 
 
 class LyricVideoRenderer:
@@ -62,7 +128,17 @@ class LyricVideoRenderer:
     def render(self, output_path: str) -> str:
         """Mock render method"""
         print("Mock LyricVideoRenderer: Starting render...")
-        return simulate_render_process(self.project_config, output_path)
+        rendered_path = simulate_render_process(self.project_config, output_path)
+        
+        # Upload to Supabase if project_id is present
+        project_id = self.project_config.get('project_id')
+        if project_id:
+            public_url = upload_video_to_supabase(rendered_path, project_id)
+            if public_url:
+                # We could potentially return the public_url instead or store it in the config
+                self.project_config['video_url'] = public_url
+                
+        return rendered_path
 
 
 if __name__ == '__main__':
