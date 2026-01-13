@@ -20,6 +20,7 @@ interface TextEditorViewProps {
   renderStatus: string;
   onLyricsUpdate: (lyrics: LyricWord[]) => void;
   audioFile: File | null;
+  onOpenTimeline?: (startIndex: number, endIndex: number) => void;
 }
 
 export const TextEditorView: React.FC<TextEditorViewProps> = ({ 
@@ -36,7 +37,8 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
   renderProgress,
   renderStatus,
   onLyricsUpdate,
-  audioFile
+  audioFile,
+  onOpenTimeline
 }) => {
   const [text, setText] = useState('');
   const lyricsContainerRef = useRef<HTMLDivElement>(null);
@@ -80,6 +82,47 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  type LineGroup = {
+    startIndex: number;
+    endIndex: number;
+  };
+
+  const getLineGroups = (): LineGroup[] => {
+    if (lyrics.length === 0) return [];
+
+    const groups: LineGroup[] = [];
+    let start = 0;
+    let count = 0;
+
+    for (let i = 0; i < lyrics.length; i++) {
+      const word = lyrics[i];
+
+      if (i !== 0 && word.breakBefore) {
+        groups.push({ startIndex: start, endIndex: i - 1 });
+        start = i;
+        count = 0;
+      }
+
+      count += 1;
+
+      const endsSentence = /[.!?]$/.test(word.text);
+      const nextHasHardBreak = i < lyrics.length - 1 && !!lyrics[i + 1].breakBefore;
+      const shouldSoftBreak = !nextHasHardBreak && (count >= 8 || (endsSentence && count >= 5));
+
+      if (shouldSoftBreak && i < lyrics.length - 1) {
+        groups.push({ startIndex: start, endIndex: i });
+        start = i + 1;
+        count = 0;
+      }
+    }
+
+    if (start <= lyrics.length - 1) {
+      groups.push({ startIndex: start, endIndex: lyrics.length - 1 });
+    }
+
+    return groups;
   };
 
   // AI Transcription handler
@@ -244,26 +287,46 @@ export const TextEditorView: React.FC<TextEditorViewProps> = ({
         {lyrics.length > 0 ? (
           <div 
             ref={lyricsContainerRef}
-            className="max-h-64 overflow-y-auto space-y-2 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg"
+            className="max-h-64 overflow-y-auto space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg"
           >
-            {lyrics.map((lyric, index) => {
-              const isActive = index === activeWordIndex;
+            {getLineGroups().map((lineGroup, lineIndex) => {
+              const lineWords = lyrics.slice(lineGroup.startIndex, lineGroup.endIndex + 1);
+              const hasActiveWord = lineWords.some((_, idx) => 
+                lineGroup.startIndex + idx === activeWordIndex
+              );
+
               return (
-                <span
-                  key={index}
-                  ref={isActive ? activeWordRef : null}
-                  className={`inline-block mr-2 px-2 py-1 rounded transition-all duration-150 ${
-                    isActive 
-                      ? 'text-white bg-indigo-600 shadow-lg' 
-                      : 'text-slate-500 dark:text-slate-400'
+                <div
+                  key={lineIndex}
+                  onClick={() => onOpenTimeline?.(lineGroup.startIndex, lineGroup.endIndex)}
+                  className={`flex flex-wrap gap-2 p-3 rounded-lg transition-all cursor-pointer ${
+                    hasActiveWord
+                      ? 'bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700'
+                      : 'bg-white dark:bg-slate-700/50 border border-transparent hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
-                  style={{
-                    textShadow: isActive ? '0 0 10px #6366f1' : 'none',
-                    color: isActive ? 'white' : undefined
-                  }}
+                  title="Click to edit word timings"
                 >
-                  {lyric.text}
-                </span>
+                  {lineWords.map((lyric, wordIndex) => {
+                    const globalIndex = lineGroup.startIndex + wordIndex;
+                    const isActive = globalIndex === activeWordIndex;
+                    return (
+                      <span
+                        key={globalIndex}
+                        ref={isActive ? activeWordRef : null}
+                        className={`inline-block px-2 py-1 rounded transition-all duration-150 ${
+                          isActive 
+                            ? 'text-white bg-indigo-600 shadow-md scale-105' 
+                            : 'text-slate-700 dark:text-slate-300'
+                        }`}
+                        style={{
+                          textShadow: isActive ? '0 0 10px #6366f1' : 'none'
+                        }}
+                      >
+                        {lyric.text}
+                      </span>
+                    );
+                  })}
+                </div>
               );
             })}
           </div>
