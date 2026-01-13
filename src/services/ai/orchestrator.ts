@@ -93,7 +93,7 @@ export class AIOrchestrator {
       console.error('Processing error:', error);
       await supabase
         .from('projects')
-        .update({ status: 'failed' })
+        .update({ status: 'failed' } as any)
         .eq('id', project.id);
       throw error;
     }
