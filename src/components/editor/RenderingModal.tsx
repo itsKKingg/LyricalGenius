@@ -54,8 +54,8 @@ export function RenderingModal({ isOpen, jobId, projectId, onClose, onComplete }
             .eq('id', projectId)
             .single();
             
-          if (!dbError && dbProject && dbProject.status === 'completed') {
-            data.video_url = dbProject.video_url || data.video_url;
+          if (!dbError && dbProject && (dbProject as any).status === 'completed') {
+            data.video_url = (dbProject as any).video_url || data.video_url;
           }
         }
 

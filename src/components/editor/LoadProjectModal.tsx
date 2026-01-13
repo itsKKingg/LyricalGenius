@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Play, Trash2, FileText } from 'lucide-react';
-import { EditorProject } from '../../../lib/projectPersistence';
-import { projectPersistenceService } from '../../../lib/projectPersistence';
+import { EditorProject } from '../../lib/projectPersistence';
+import { projectPersistenceService } from '../../lib/projectPersistence';
 
 interface LoadProjectModalProps {
   isOpen: boolean;

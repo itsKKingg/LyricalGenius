@@ -23,7 +23,7 @@ export class AIOrchestrator {
     const validatedMetadata = AudioMetadataSchema.parse(metadata);
 
     // 2. Create project entry
-    const { data: project, error: projectError } = await supabase
+    const { data: project, error: projectError } = await (supabase as any)
       .from('projects')
       .insert({
         user_id: userId,
@@ -48,7 +48,7 @@ export class AIOrchestrator {
       if (storageError) throw new Error(`Failed to upload audio: ${storageError.message}`);
 
       // Update status to processing
-      await supabase.from('projects').update({ status: 'processing' }).eq('id', project.id);
+      await (supabase as any).from('projects').update({ status: 'processing' }).eq('id', project.id);
 
       let audioForTranscription: Buffer | Blob = audioData;
       let usedFallback = false;
@@ -72,7 +72,7 @@ export class AIOrchestrator {
       const timedJson = await this.getTimestamps(audioForTranscription);
 
       // 6. Update project with results
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('projects')
         .update({
           timed_json: timedJson as any,
