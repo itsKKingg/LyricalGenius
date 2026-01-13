@@ -620,6 +620,103 @@ function App() {
     }
   };
 
+  return (
+    <div className={`${state.theme} transition-colors duration-200`}>
+      <div className="flex min-h-screen bg-workspace dark:bg-workspaceDark font-sans text-slate-900 dark:text-white selection:bg-purple-200">
+        <Sidebar
+          currentView={state.currentView}
+          activeAestheticId={state.activeAestheticId}
+          aesthetics={state.aesthetics}
+          onNavigate={handleNavigate}
+          onCreateAesthetic={handleCreateAesthetic}
+          activeTab={state.activeTab}
+          setActiveTab={setActiveTab}
+        />
+
+        {/* Main Content Area */}
+        <main className="ml-[260px] flex-1 relative flex flex-col min-h-screen">
+          {/* Top User Nav */}
+          {['HOME', 'AESTHETICS', 'WORKSPACE', 'PEXELS', 'PINTEREST', 'TEXT_EDITOR', 'SETTINGS'].includes(state.currentView) && (
+             <div className="h-16 flex items-center justify-between px-8 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-[#111318]/50 backdrop-blur-sm sticky top-0 z-30 transition-colors">
+              <div className="flex items-center gap-4">
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Toggle theme"
+                >
+                  {state.theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                </button>
+
+                {/* User Menu */}
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                  <User size={16} />
+                  <span>Demo User</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Animated Content Container */}
+          <div className="flex-1 relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={state.currentView + (state.currentView === 'WORKSPACE' ? state.activeTab : '')}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 flex flex-col"
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </main>
+
+        {/* Modals */}
+        {state.currentModal === 'CREATE_CONTENT' && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-96 max-w-[90vw]">
+                    <h3 className="text-lg font-semibold mb-4 dark:text-white">Create New Content</h3>
+                    <div className="space-y-3">
+                        <button
+                            onClick={() => openCreateModal('video')}
+                            className="w-full p-3 text-left rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Video size={20} className="text-blue-600" />
+                                <div>
+                                    <div className="font-medium dark:text-white">Video</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Create a video with this aesthetic</div>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => openCreateModal('slideshow')}
+                            className="w-full p-3 text-left rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <div className="flex items-center gap-3">
+                                <PlaySquare size={20} className="text-purple-600" />
+                                <div>
+                                    <div className="font-medium dark:text-white">Slideshow</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Create a slideshow with this aesthetic</div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    <button
+                        onClick={closeModal}
+                        className="mt-4 w-full py-2 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default App;
