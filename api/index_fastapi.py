@@ -64,6 +64,9 @@ async def background_render_job(job_id: str, project_config: dict):
         # Render the video (this is CPU-intensive)
         rendered_path = renderer.render(output_path)
         
+        # Check if video_url was added to config during render (by upload_video_to_supabase)
+        video_url = project_config.get('video_url')
+        
         jobs[job_id]['progress'] = 90
         jobs[job_id]['message'] = 'Finalizing...'
         
@@ -71,6 +74,7 @@ async def background_render_job(job_id: str, project_config: dict):
         jobs[job_id]['status'] = JobStatus.COMPLETED
         jobs[job_id]['progress'] = 100
         jobs[job_id]['output_path'] = rendered_path
+        jobs[job_id]['video_url'] = video_url
         jobs[job_id]['message'] = 'Render complete!'
         jobs[job_id]['completed_at'] = datetime.now().isoformat()
         
@@ -265,6 +269,7 @@ async def get_job_status(job_id: str):
         
         if job['status'] == JobStatus.COMPLETED:
             response['output_path'] = job.get('output_path')
+            response['video_url'] = job.get('video_url')
             response['duration'] = job.get('duration')
             response['lyrics_count'] = job.get('lyrics_count')
         elif job['status'] == JobStatus.FAILED:

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, AlertCircle, Loader } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient';
 
 interface RenderJob {
   job_id: string;
@@ -8,6 +9,7 @@ interface RenderJob {
   progress: number;
   message: string;
   output_path?: string;
+  video_url?: string;
   duration?: number;
   lyrics_count?: number;
   error?: string;
@@ -16,11 +18,12 @@ interface RenderJob {
 interface RenderingModalProps {
   isOpen: boolean;
   jobId: string | null;
+  projectId?: string | null;
   onClose: () => void;
   onComplete?: (outputPath: string) => void;
 }
 
-export function RenderingModal({ isOpen, jobId, onClose, onComplete }: RenderingModalProps) {
+export function RenderingModal({ isOpen, jobId, projectId, onClose, onComplete }: RenderingModalProps) {
   const [job, setJob] = useState<RenderJob | null>(null);
   const [isPolling, setIsPolling] = useState(false);
 
@@ -35,24 +38,39 @@ export function RenderingModal({ isOpen, jobId, onClose, onComplete }: Rendering
 
     const pollJobStatus = async () => {
       try {
+        // 1. Poll FastAPI for progress and status
         const response = await fetch(`/api/status/${jobId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch job status');
         }
 
         const data = await response.json();
+        
+        // 2. If COMPLETED, also check database as requested
+        if (data.status === 'COMPLETED' && projectId) {
+          const { data: dbProject, error: dbError } = await supabase
+            .from('editor_projects')
+            .select('status, video_url')
+            .eq('id', projectId)
+            .single();
+            
+          if (!dbError && dbProject && dbProject.status === 'completed') {
+            data.video_url = dbProject.video_url || data.video_url;
+          }
+        }
+
         setJob(data);
 
         // Stop polling if job is completed or failed
         if (data.status === 'COMPLETED' || data.status === 'FAILED') {
           setIsPolling(false);
-          if (data.status === 'COMPLETED' && data.output_path) {
-            onComplete?.(data.output_path);
+          if (data.status === 'COMPLETED' && (data.output_path || data.video_url)) {
+            onComplete?.(data.video_url || data.output_path || '');
           }
         }
       } catch (error) {
         console.error('Error polling job status:', error);
-        setIsPolling(false);
+        // Don't stop polling on single error, might be temporary
       }
     };
 
@@ -69,7 +87,9 @@ export function RenderingModal({ isOpen, jobId, onClose, onComplete }: Rendering
   }, [jobId, isOpen, onComplete]);
 
   const handleDownload = () => {
-    if (jobId) {
+    if (job?.video_url) {
+      window.open(job.video_url, '_blank');
+    } else if (jobId) {
       window.open(`/api/download/${jobId}`, '_blank');
     }
   };
@@ -144,11 +164,21 @@ export function RenderingModal({ isOpen, jobId, onClose, onComplete }: Rendering
                   </div>
                 )}
                 {job.status === 'COMPLETED' && (
-                  <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
+                  job.video_url ? (
+                    <div className="w-full aspect-video rounded-lg overflow-hidden bg-black shadow-inner">
+                      <video 
+                        src={job.video_url} 
+                        controls 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )
                 )}
                 {job.status === 'FAILED' && (
                   <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
@@ -207,7 +237,15 @@ export function RenderingModal({ isOpen, jobId, onClose, onComplete }: Rendering
               {/* Success Details */}
               {job.status === 'COMPLETED' && (
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                  <div className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                  <div className="text-sm text-green-800 dark:text-green-200 space-y-2">
+                    {job.video_url && (
+                      <div className="break-all">
+                        <p className="font-semibold mb-1">Video URL:</p>
+                        <a href={job.video_url} target="_blank" rel="noopener noreferrer" className="underline hover:text-green-600">
+                          {job.video_url}
+                        </a>
+                      </div>
+                    )}
                     {job.duration && (
                       <p>Duration: {job.duration.toFixed(1)}s</p>
                     )}

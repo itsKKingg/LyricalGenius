@@ -290,6 +290,7 @@ function App() {
     const selectedMediaUrl = state.selectedMedia?.url || 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4';
     
     return {
+      project_id: currentProjectId,
       background_url: selectedMediaUrl,
       audio_url: '/tmp/audio.mp3', // Demo audio file
       lyricArray: state.words.length > 0 ? state.words : sampleLyrics,
@@ -789,10 +790,11 @@ function App() {
         <RenderingModal
           isOpen={showRenderingModal}
           jobId={renderJobId}
+          projectId={currentProjectId}
           onClose={closeRenderingModal}
           onComplete={handleRenderComplete}
         />
-      </div>
+
     </div>
   );
 }
