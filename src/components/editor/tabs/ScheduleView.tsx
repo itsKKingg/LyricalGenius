@@ -30,9 +30,9 @@ export const ScheduleView: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-             <Button variant="primary" className="bg-blue-400 hover:bg-blue-500 text-white border-transparent rounded-full px-4 flex items-center gap-2 text-xs font-semibold shadow-none">
-                 Drag a post to an account to schedule it!
-                 <ChevronDown size={14} />
+             <Button variant="default" className="bg-blue-400 hover:bg-blue-500 text-white border-transparent rounded-full px-4 flex items-center gap-2 text-xs font-semibold shadow-none">
+               <ChevronDown size={14} className="mr-1" />
+               Drag a post to an account to schedule it!
              </Button>
           </div>
       </div>
@@ -47,8 +47,14 @@ export const ScheduleView: React.FC = () => {
          </div>
 
          <div className="flex gap-4 mb-8">
-             <Button variant="primary" className="bg-[#0f1115] hover:bg-[#252830] text-white font-semibold" icon={<Plus size={16}/>}>Connect TikTok account</Button>
-             <Button variant="secondary" className="bg-white border-slate-200 text-slate-700" icon={<ExternalLink size={16}/>}>Where does my content go when sent to TikTok?</Button>
+             <Button variant="default" className="bg-[#0f1115] hover:bg-[#252830] text-white font-semibold">
+               <Plus size={16} className="mr-2" />
+               Connect TikTok account
+             </Button>
+             <Button variant="secondary" className="bg-white border-slate-200 text-slate-700">
+               <ExternalLink size={16} className="mr-2" />
+               Where does my content go when sent to TikTok?
+             </Button>
          </div>
 
          <div className="flex gap-6 h-full min-h-0">
@@ -76,10 +82,22 @@ export const ScheduleView: React.FC = () => {
                      <span className="font-bold text-slate-900">heyitskkingg</span>
                  </div>
 
-                 <Button variant="primary" className="w-full justify-start bg-[#0f1115] text-white" icon={<Bell size={16}/>}>Enable notifications</Button>
-                 <Button variant="secondary" className="w-full justify-start border-slate-200" icon={<Settings size={16}/>}>Account settings</Button>
-                 <Button variant="secondary" className="w-full justify-start border-slate-200" icon={<Type size={16}/>}>Caption posts</Button>
-                 <Button variant="secondary" className="w-full justify-start border-slate-200 bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100" icon={<List size={16}/>}>Reorder posts</Button>
+                 <Button variant="default" className="w-full justify-start bg-[#0f1115] text-white">
+                                     <Bell size={16} className="mr-2" />
+                                     Enable notifications
+                                   </Button>
+                                   <Button variant="secondary" className="w-full justify-start border-slate-200">
+                                     <Settings size={16} className="mr-2" />
+                                     Account settings
+                                   </Button>
+                                   <Button variant="secondary" className="w-full justify-start border-slate-200">
+                                     <Type size={16} className="mr-2" />
+                                     Caption posts
+                                   </Button>
+                                   <Button variant="secondary" className="w-full justify-start border-slate-200 bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100">
+                                     <List size={16} className="mr-2" />
+                                     Reorder posts
+                                   </Button>
              </div>
 
              {/* Calendar Grid */}

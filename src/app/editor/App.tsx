@@ -48,82 +48,47 @@ function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-
   // Project persistence state
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [isSavingProject, setIsSavingProject] = useState(false);
   const [isProjectSaved, setIsProjectSaved] = useState(true);
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
-  const [isSavingProject, setIsSavingProject] = useState(false);
 
-  // Render state
-  const [renderProgress, setRenderProgress] = useState<number | null>(null);
-  const [renderStatus, setRenderStatus] = useState<string>('');
-  const [renderJobId, setRenderJobId] = useState<string | null>(null);
+  // Modal states
   const [showRenderingModal, setShowRenderingModal] = useState(false);
+  const [renderJobId, setRenderJobId] = useState<string | null>(null);
 
-  // Word Timeline Modal state
-  const [selectedLineRange, setSelectedLineRange] = useState<{ start: number; end: number } | null>(null);
+  // Helper function to get active aesthetic
+  const getActiveAesthetic = (): Aesthetic | null => {
+    if (!state.activeAestheticId) return null;
+    return state.aesthetics.find(a => a.id === state.activeAestheticId) || null;
+  };
 
-  // --- Audio Playback Functions ---
+  // Sample lyrics for when none are available
+  const sampleLyrics: LyricWord[] = [
+    { text: "Hello", start: 0.0, end: 0.5 },
+    { text: "world", start: 0.5, end: 1.0 },
+    { text: "this", start: 1.0, end: 1.3 },
+    { text: "is", start: 1.3, end: 1.5 },
+    { text: "a", start: 1.5, end: 1.7 },
+    { text: "sample", start: 1.7, end: 2.2 },
+    { text: "test", start: 2.2, end: 2.7 }
+  ];
 
-  // Update current time using requestAnimationFrame for smooth playback
-  useEffect(() => {
-    if (isPlaying && audioRef.current) {
-      const updateTime = () => {
-        if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime * 1000); // Convert to milliseconds
-          animationFrameRef.current = requestAnimationFrame(updateTime);
-        }
-      };
-      updateTime();
-    } else {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+  // Update time during playback
+  const updateTime = () => {
+    if (audioRef.current && isPlaying) {
+      setCurrentTime(audioRef.current.currentTime);
+      animationFrameRef.current = requestAnimationFrame(updateTime);
     }
+  };
 
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [isPlaying]);
-
-  // Project persistence - Auto-save every 30 seconds if state has changed
-  useEffect(() => {
-    const autoSaveInterval = setInterval(async () => {
-      if (!isProjectSaved && !isSavingProject && state.currentView === 'WORKSPACE') {
-        await handleAutoSave();
-      }
-    }, 30000); // 30 seconds
-
-    return () => clearInterval(autoSaveInterval);
-  }, [isProjectSaved, isSavingProject, state.currentView]);
-
-  // Project persistence - Save when state changes (debounced)
-  useEffect(() => {
-    if (state.currentView !== 'WORKSPACE') return;
-    
-    const saveTimeout = setTimeout(async () => {
-      await handleAutoSave();
-    }, 2000); // Auto-save 2 seconds after state change
-
-    return () => clearTimeout(saveTimeout);
-  }, [
-    state.selectedMedia?.url, 
-    JSON.stringify(state.words), 
-    state.audioFile?.name, 
-    state.font, 
-    state.color, 
-    state.animationStyle,
-    state.currentView
-  ]);
-
+  // Audio event handlers
   const playAudio = () => {
     if (audioRef.current) {
       audioRef.current.play();
       setIsPlaying(true);
+      updateTime();
     }
   };
 
@@ -131,13 +96,118 @@ function App() {
     if (audioRef.current) {
       audioRef.current.pause();
       setIsPlaying(false);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     }
   };
 
-  const seekAudio = (timeMs: number) => {
+  const seekAudio = (time: number) => {
     if (audioRef.current) {
-      audioRef.current.currentTime = timeMs / 1000; // Convert milliseconds to seconds
-      setCurrentTime(timeMs);
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  // Theme management
+  const toggleTheme = () => {
+    setState(prev => ({ ...prev, theme: prev.theme === 'light' ? 'dark' : 'light' }));
+  };
+
+  // Navigation handlers
+  const handleNavigate = (view: ViewType, aestheticId?: string) => {
+    setState(prev => ({
+      ...prev,
+      currentView: view,
+      activeAestheticId: aestheticId || prev.activeAestheticId
+    }));
+  };
+
+  // Aesthetic management
+  const handleCreateAesthetic = () => {
+    const newAesthetic: Aesthetic = {
+      id: generateId(),
+      name: `New Aesthetic ${state.aesthetics.length + 1}`,
+      description: 'A new aesthetic',
+      thumbnail: '/placeholder.jpg',
+      theme: state.theme
+    };
+    
+    setState(prev => ({
+      ...prev,
+      aesthetics: [...prev.aesthetics, newAesthetic]
+    }));
+  };
+
+  // Media management
+  const handleMediaSelect = (media: MediaAsset) => {
+    setState(prev => ({ ...prev, selectedMedia: media }));
+  };
+
+  // Export functionality
+  const handleExport = () => {
+    console.log('Exporting...', state);
+    // This would typically trigger a video rendering process
+  };
+
+  // Lyrics management
+  const handleLyricsUpdate = (words: LyricWord[]) => {
+    setState(prev => ({ ...prev, words }));
+  };
+
+  // Modal handlers
+  const openCreateModal = (type: 'video' | 'slideshow') => {
+    setState(prev => ({ ...prev, currentModal: 'CREATE_CONTENT', createContentType: type }));
+  };
+
+  const closeModal = () => setState(prev => ({ ...prev, currentModal: 'NONE' }));
+
+  const openWordTimelineModal = () => setState(prev => ({ ...prev, currentModal: 'WORD_TIMELINE' }));
+  const closeWordTimelineModal = () => setState(prev => ({ ...prev, currentModal: 'NONE' }));
+
+  // Rendering handlers
+  const handleRenderComplete = () => {
+    setShowRenderingModal(false);
+    setRenderJobId(null);
+  };
+  const closeRenderingModal = () => setShowRenderingModal(false);
+
+  // Progress and status rendering
+  const renderProgress = (progress: number) => {
+    return <div className="w-full bg-gray-200 rounded-full h-2">
+      <div 
+        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+        style={{ width: `${progress}%` }}
+      ></div>
+    </div>;
+  };
+
+  const renderStatus = (status: string) => {
+    return <div className="text-sm text-gray-600">{status}</div>;
+  };
+
+  // Audio file handling
+  const handleAudioFile = (file: File) => {
+    const url = URL.createObjectURL(file);
+    if (audioRef.current) {
+      audioRef.current.src = url;
+    }
+    setState(prev => ({
+      ...prev,
+      audioFile: file,
+      fileName: file.name
+    }));
+  };
+
+  // Word timeline handler
+  const handleOpenWordTimeline = () => {
+    openWordTimelineModal();
+  };
+
+  // Audio time update handler
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
     }
   };
 
@@ -146,7 +216,7 @@ function App() {
     if (state.audioFile && !audioRef.current) {
       const audioUrl = URL.createObjectURL(state.audioFile);
       audioRef.current = new Audio(audioUrl);
-      
+
       audioRef.current.addEventListener('loadedmetadata', () => {
         console.log('Audio loaded:', {
           duration: audioRef.current?.duration,
@@ -159,6 +229,8 @@ function App() {
         setCurrentTime(0);
       });
 
+      audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
+
       return () => {
         if (audioRef.current) {
           audioRef.current.pause();
@@ -169,230 +241,30 @@ function App() {
     }
   }, [state.audioFile]);
 
+  // Audio playback effect
+  useEffect(() => {
+    if (isPlaying) {
+      updateTime();
+    } else if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+  }, [isPlaying]);
+
   // Tab Handler
   const setActiveTab = (tab: 'editor' | 'pexels' | 'pinterest') => {
     setState(prev => ({ ...prev, activeTab: tab }));
   };
 
-  // Media Selection Handler
-  const handleMediaSelect = (media: MediaAsset) => {
-    setState(prev => ({ ...prev, selectedMedia: media }));
-  };
-
-  // Toggle Theme Handler
-  const toggleTheme = () => {
-    setState(prev => ({
-      ...prev,
-      theme: prev.theme === 'light' ? 'dark' : 'light'
-    }));
-  };
-
-  // --- Navigation & Data Management ---
-
-  const handleNavigate = (view: ViewType, aestheticId?: string) => {
-    setState(prev => ({
-      ...prev,
-      currentView: view,
-      activeAestheticId: aestheticId || (view === 'WORKSPACE' ? prev.activeAestheticId : null)
-    }));
-  };
-
-  const handleCreateAesthetic = () => {
-    const newId = generateId();
-    const newAesthetic: Aesthetic = {
-      id: newId,
-      name: `Untitled Aesthetic ${state.aesthetics.length + 1}`,
-      description: 'A new visual universe for your lyrics.',
-      thumbnail: `https://picsum.photos/400/300?random=${newId}`,
-      theme: 'Modern'
-    };
-
-    setState(prev => ({
-      ...prev,
-      aesthetics: [...prev.aesthetics, newAesthetic],
-      currentView: 'WORKSPACE',
-      activeAestheticId: newId,
-      // Reset workspace for new aesthetic
-      audioFile: null,
-      audioBuffer: null,
-      audioDuration: 0,
-      fileName: '',
-      videos: [],
-      photos: []
-    }));
-  };
-
-  const getActiveAesthetic = () => {
-    return state.aesthetics.find(a => a.id === state.activeAestheticId);
-  };
-
-  // --- Workspace Actions ---
-
-  const handleAudioUpload = async (file: File) => {
-    try {
-        const arrayBuffer = await file.arrayBuffer();
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        
-        setState(prev => ({
-            ...prev,
-            audioFile: file,
-            audioBuffer: audioBuffer,
-            audioDuration: audioBuffer.duration,
-            fileName: file.name,
-            clipRange: [0, audioBuffer.duration],
-            currentModal: 'CLIP_SELECTOR'
-        }));
-    } catch (e) {
-        console.error("Error decoding audio", e);
-        alert("Failed to load audio file.");
-    }
-  };
-
-  const handleClipConfirm = (range: [number, number]) => {
-      setState(prev => ({
-          ...prev,
-          clipRange: range,
-          currentModal: 'AUDIO_ANALYSIS'
-      }));
-  };
-
-  const handleSectionsUpdate = (newSections: Section[]) => {
-      setState(prev => ({ ...prev, sections: newSections }));
-  };
-
-  const handleWordTimingsSave = (newWords: LyricWord[]) => {
-      setState(prev => ({ ...prev, words: newWords, currentModal: 'NONE' }));
-  };
-
-  const handleLyricsUpdate = (newLyrics: LyricWord[]) => {
-      setState(prev => ({ ...prev, words: newLyrics }));
-      setIsProjectSaved(false); // Mark project as unsaved
-  };
-
-  const handleOpenWordTimeline = (startIndex: number, endIndex: number) => {
-    setSelectedLineRange({ start: startIndex, end: endIndex });
-    setState(prev => ({ ...prev, currentModal: 'WORD_TIMELINE' }));
-  };
-
-  const closeWordTimelineModal = () => {
-    setState(prev => ({ ...prev, currentModal: 'NONE' }));
-    setSelectedLineRange(null);
-  };
-
-  // Sample lyrics for testing - in real app this would come from word timing analysis
-  const sampleLyrics: LyricWord[] = [
-    { text: "Hello", start: 0, end: 800 },
-    { text: "world", start: 800, end: 1600 },
-    { text: "this", start: 1600, end: 2400 },
-    { text: "is", start: 2400, end: 3000 },
-    { text: "a", start: 3000, end: 3400 },
-    { text: "test", start: 3400, end: 4200 },
-    { text: "of", start: 4200, end: 4600 },
-    { text: "the", start: 4600, end: 5200 },
-    { text: "audio", start: 5200, end: 6000 },
-    { text: "sync", start: 6000, end: 6800 },
-    { text: "system", start: 6800, end: 7600 }
-  ];
-
-  const openCreateModal = (type: 'video' | 'slideshow') => {
-      setState(prev => ({ ...prev, currentModal: 'CREATE_CONTENT', createContentType: type }));
-  };
-
-  const generateProjectJson = () => {
-    // Use actual uploaded media if available, otherwise use sample
-    const selectedMediaUrl = state.selectedMedia?.url || 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4';
-    
-    return {
-      project_id: currentProjectId,
-      background_url: selectedMediaUrl,
-      audio_url: '/tmp/audio.mp3', // Demo audio file
-      lyricArray: state.words.length > 0 ? state.words : sampleLyrics,
-      lyrics: state.words.length > 0 ? state.words : sampleLyrics, // Support both formats
-      font: state.font || 'Inter',
-      color: state.color || '#ffffff',
-      animationStyle: state.animationStyle || 'fade'
-    };
-  };
-
-  const handleExport = async () => {
-    const projectJson = generateProjectJson();
-    console.log('Project JSON Blueprint:', JSON.stringify(projectJson, null, 2));
-    
-    // For demo purposes, we'll simulate a background video file
-    // In a real implementation, this would be the uploaded background video
-    if (projectJson.background_url.includes('sample-videos.com')) {
-      // Download and save the sample video locally for demo
-      try {
-        const response = await fetch(projectJson.background_url);
-        const blob = await response.blob();
-        const formData = new FormData();
-        formData.append('background_video', blob, 'background.mp4');
-        
-        // For demo, we'll use a local path (this would be handled by file upload in real app)
-        projectJson.background_url = '/tmp/background.mp4';
-      } catch (error) {
-        console.log('Demo: Using sample background video path');
-        projectJson.background_url = '/tmp/background.mp4';
-      }
-    }
-    
-    try {
-      const response = await fetch('/api/render', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(projectJson),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Render request failed');
-      }
-
-      const data = await response.json();
-      console.log('Render job started:', data);
-
-      // Store job ID and show modal
-      setRenderJobId(data.job_id);
-      setShowRenderingModal(true);
-      
-      // Reset local progress tracking
-      setRenderProgress(null);
-      setRenderStatus('');
-
-    } catch (error) {
-      console.error('Export failed:', error);
-      setRenderStatus('Export failed. Please try again.');
-      setTimeout(() => setRenderStatus(''), 3000);
-    }
-  };
-
-  const handleRenderComplete = (outputPath: string) => {
-    console.log('Render completed:', outputPath);
-    // The modal will handle the download functionality
-  };
-
-  const closeRenderingModal = () => {
-    setShowRenderingModal(false);
-    setRenderJobId(null);
-  };
-
-  // --- Project Persistence Functions ---
-
-  const handleAutoSave = async () => {
-    if (state.currentView !== 'WORKSPACE') return;
+  // Project persistence
+  const saveProject = async () => {
+    if (!currentProjectId) return;
     
     setIsSavingProject(true);
-    setIsProjectSaved(false);
-
     try {
       const projectState: ProjectState = {
         title: getActiveAesthetic()?.name || 'Untitled Project',
-        background_url: state.selectedMedia?.url,
-        audio_url: state.audioFile ? URL.createObjectURL(state.audioFile) : undefined,
-        lyrics_json: state.words.length > 0 ? state.words : sampleLyrics,
+        background_url: state.selectedMedia?.url || undefined,
+        lyrics_json: state.words,
         activeTab: state.activeTab || 'editor',
         selectedMedia: state.selectedMedia,
         audioFile: state.audioFile,
@@ -403,32 +275,38 @@ function App() {
         animationStyle: state.animationStyle
       };
 
-      const result = await projectPersistenceService.saveProject(
-        projectState,
-        currentProjectId || undefined
-      );
-
+      const result = await projectPersistenceService.saveProject(projectState, currentProjectId);
+      
       if (result.success) {
         setIsProjectSaved(true);
         setLastSaveTime(new Date());
-        if (result.projectId && !currentProjectId) {
-          setCurrentProjectId(result.projectId);
-        }
+        console.log('Project saved successfully');
       } else {
-        console.error('Auto-save failed:', result.error);
+        console.error('Failed to save project:', result.error);
         setIsProjectSaved(false);
       }
     } catch (error) {
-      console.error('Auto-save error:', error);
+      console.error('Error saving project:', error);
       setIsProjectSaved(false);
     } finally {
       setIsSavingProject(false);
     }
   };
 
+  // Auto-save effect
+  useEffect(() => {
+    if (currentProjectId && !isProjectSaved && !isSavingProject) {
+      const timer = setTimeout(() => {
+        saveProject();
+      }, 2000); // Auto-save after 2 seconds of inactivity
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentProjectId, state, isProjectSaved, isSavingProject]);
+
+  // Load project handler
   const handleLoadProject = async (projectId: string) => {
     setIsSavingProject(true);
-    
     try {
       const result = await projectPersistenceService.loadProject(projectId);
       
@@ -458,7 +336,7 @@ function App() {
         setCurrentProjectId(projectId);
         setIsProjectSaved(true);
         setLastSaveTime(new Date(project.last_edited));
-        
+
         console.log('Project loaded successfully');
       } else {
         console.error('Failed to load project:', result.error);
@@ -479,7 +357,7 @@ function App() {
     };
   }, []);
 
-  const closeModal = () => setState(prev => ({ ...prev, currentModal: 'NONE' }));
+  const closeModalHandler = () => setState(prev => ({ ...prev, currentModal: 'NONE' }));
 
   // --- View Rendering ---
 
@@ -543,8 +421,8 @@ function App() {
                   onSeek={seekAudio}
                   audioDuration={state.audioDuration}
                   onExport={handleExport}
-                  renderProgress={renderProgress}
-                  renderStatus={renderStatus}
+                  renderProgress={null}
+                  renderStatus={''}
                   onLyricsUpdate={handleLyricsUpdate}
                   audioFile={state.audioFile}
                   onOpenTimeline={handleOpenWordTimeline}
@@ -604,8 +482,8 @@ function App() {
             onSeek={seekAudio}
             audioDuration={state.audioDuration}
             onExport={handleExport}
-            renderProgress={renderProgress}
-            renderStatus={renderStatus}
+            renderProgress={null}
+            renderStatus={''}
             onLyricsUpdate={handleLyricsUpdate}
             audioFile={state.audioFile}
             onOpenTimeline={handleOpenWordTimeline}
@@ -620,6 +498,103 @@ function App() {
     }
   };
 
+  return (
+    <div className={`${state.theme} transition-colors duration-200`}>
+      <div className="flex min-h-screen bg-workspace dark:bg-workspaceDark font-sans text-slate-900 dark:text-white selection:bg-purple-200">
+        <Sidebar
+          currentView={state.currentView}
+          activeAestheticId={state.activeAestheticId}
+          aesthetics={state.aesthetics}
+          onNavigate={handleNavigate}
+          onCreateAesthetic={handleCreateAesthetic}
+          activeTab={state.activeTab}
+          setActiveTab={setActiveTab}
+        />
+
+        {/* Main Content Area */}
+        <main className="ml-[260px] flex-1 relative flex flex-col min-h-screen">
+          {/* Top User Nav */}
+          {['HOME', 'AESTHETICS', 'WORKSPACE', 'PEXELS', 'PINTEREST', 'TEXT_EDITOR', 'SETTINGS'].includes(state.currentView) && (
+             <div className="h-16 flex items-center justify-between px-8 border-b border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-[#111318]/50 backdrop-blur-sm sticky top-0 z-30 transition-colors">
+              <div className="flex items-center gap-4">
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Toggle theme"
+                >
+                  {state.theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                </button>
+
+                {/* User Menu */}
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                  <User size={16} />
+                  <span>Demo User</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Animated Content Container */}
+          <div className="flex-1 relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={state.currentView + (state.currentView === 'WORKSPACE' ? state.activeTab : '')}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 flex flex-col"
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </main>
+
+        {/* Modals */}
+        {state.currentModal === 'CREATE_CONTENT' && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-96 max-w-[90vw]">
+                    <h3 className="text-lg font-semibold mb-4 dark:text-white">Create New Content</h3>
+                    <div className="space-y-3">
+                        <button
+                            onClick={() => openCreateModal('video')}
+                            className="w-full p-3 text-left rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Video size={20} className="text-blue-600" />
+                                <div>
+                                    <div className="font-medium dark:text-white">Video</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Create a video with this aesthetic</div>
+                                </div>
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => openCreateModal('slideshow')}
+                            className="w-full p-3 text-left rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <div className="flex items-center gap-3">
+                                <PlaySquare size={20} className="text-purple-600" />
+                                <div>
+                                    <div className="font-medium dark:text-white">Slideshow</div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">Create a slideshow with this aesthetic</div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    <button
+                        onClick={closeModal}
+                        className="mt-4 w-full py-2 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default App;

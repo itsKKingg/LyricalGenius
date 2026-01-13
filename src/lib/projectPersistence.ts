@@ -72,7 +72,7 @@ export class ProjectPersistenceService {
             
             if (projectId) {
               // Update existing project
-              result = await supabase
+              result = await (supabase as any)
                 .from('editor_projects')
                 .update(projectData)
                 .eq('id', projectId)
@@ -81,9 +81,9 @@ export class ProjectPersistenceService {
                 .single();
             } else {
               // Create new project
-              result = await supabase
+              result = await (supabase as any)
                 .from('editor_projects')
-                .insert(projectData)
+                .insert(projectData as any)
                 .select()
                 .single();
             }
@@ -136,7 +136,7 @@ export class ProjectPersistenceService {
       
       if (projectId) {
         // Update existing project
-        result = await supabase
+        result = await (supabase as any)
           .from('editor_projects')
           .update(projectData)
           .eq('id', projectId)
@@ -145,9 +145,9 @@ export class ProjectPersistenceService {
           .single();
       } else {
         // Create new project
-        result = await supabase
-          .from('editor_projects')
-          .insert(projectData)
+        result = await (supabase as any)
+          .from('editor_projects' as any)
+          .insert(projectData as any)
           .select()
           .single();
       }
