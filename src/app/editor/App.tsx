@@ -10,6 +10,7 @@ import { ContentDraftView } from '../../components/editor/tabs/ContentDraftView'
 import { ScheduleView } from '../../components/editor/tabs/ScheduleView';
 import { VideoPreview } from '../../components/editor/VideoPreview';
 import { RenderingModal } from '../../components/editor/RenderingModal';
+import { WordTimelineModal } from '../../components/editor/WordTimelineModal';
 import { User, PenLine, Video, PlaySquare, Settings, LogOut, Moon, Sun, Check } from 'lucide-react';
 import { AppState, Section, LyricWord, ViewType, Aesthetic, MediaAsset } from './types';
 import { generateId } from './utils';
@@ -60,6 +61,9 @@ function App() {
   const [renderStatus, setRenderStatus] = useState<string>('');
   const [renderJobId, setRenderJobId] = useState<string | null>(null);
   const [showRenderingModal, setShowRenderingModal] = useState(false);
+
+  // Word Timeline Modal state
+  const [selectedLineRange, setSelectedLineRange] = useState<{ start: number; end: number } | null>(null);
 
   // --- Audio Playback Functions ---
 
@@ -264,6 +268,16 @@ function App() {
   const handleLyricsUpdate = (newLyrics: LyricWord[]) => {
       setState(prev => ({ ...prev, words: newLyrics }));
       setIsProjectSaved(false); // Mark project as unsaved
+  };
+
+  const handleOpenWordTimeline = (startIndex: number, endIndex: number) => {
+    setSelectedLineRange({ start: startIndex, end: endIndex });
+    setState(prev => ({ ...prev, currentModal: 'WORD_TIMELINE' }));
+  };
+
+  const closeWordTimelineModal = () => {
+    setState(prev => ({ ...prev, currentModal: 'NONE' }));
+    setSelectedLineRange(null);
   };
 
   // Sample lyrics for testing - in real app this would come from word timing analysis
@@ -532,6 +546,7 @@ function App() {
                   renderStatus={renderStatus}
                   onLyricsUpdate={handleLyricsUpdate}
                   audioFile={state.audioFile}
+                  onOpenTimeline={handleOpenWordTimeline}
                 />
               )}
             </div>
@@ -592,6 +607,7 @@ function App() {
             renderStatus={renderStatus}
             onLyricsUpdate={handleLyricsUpdate}
             audioFile={state.audioFile}
+            onOpenTimeline={handleOpenWordTimeline}
             />
             );
 
@@ -777,14 +793,19 @@ function App() {
           </div>
         )}
 
-        {state.currentModal === 'WORD_TIMELINE' && state.audioBuffer && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-[#1A1D23] p-6 rounded-lg">
-                  <p className="text-slate-900 dark:text-white">Word Timeline Modal</p>
-                  <button onClick={closeModal} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded">Close</button>
-              </div>
-          </div>
-        )}
+        <WordTimelineModal
+          isOpen={state.currentModal === 'WORD_TIMELINE'}
+          words={state.words.length > 0 ? state.words : sampleLyrics}
+          initialSelection={selectedLineRange}
+          currentTime={currentTime}
+          isPlaying={isPlaying}
+          audioDuration={state.audioDuration}
+          onClose={closeWordTimelineModal}
+          onPlay={playAudio}
+          onPause={pauseAudio}
+          onSeek={seekAudio}
+          onWordsUpdate={handleLyricsUpdate}
+        />
 
         {/* Rendering Modal */}
         <RenderingModal

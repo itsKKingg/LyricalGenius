@@ -29,6 +29,11 @@ export interface LyricWord {
   text: string;
   start: number;
   end: number;
+  /**
+   * Forces a new rendered line before this word in the video.
+   * Optional to preserve compatibility with existing saved projects.
+   */
+  breakBefore?: boolean;
 }
 
 export interface MediaAsset {
