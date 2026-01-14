@@ -43,7 +43,7 @@ export async function signIn(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/editor')
 }
 
 export async function signOut() {
