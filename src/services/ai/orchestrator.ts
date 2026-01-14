@@ -17,7 +17,7 @@ export class AIOrchestrator {
     metadata: unknown,
     userId: string
   ) {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 1. Validate metadata
     const validatedMetadata = AudioMetadataSchema.parse(metadata);
