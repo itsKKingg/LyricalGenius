@@ -100,12 +100,19 @@ export class AIOrchestrator {
   }
 
   private async isolateVocals(audioData: Buffer | Blob): Promise<Buffer> {
+    let bodyData: Blob;
+    if (audioData instanceof Buffer) {
+      bodyData = new Blob([new Uint8Array(audioData)]);
+    } else {
+      bodyData = audioData as Blob;
+    }
+    
     const response = await fetch(
       'https://api-inference.huggingface.co/models/htdemucs', // Example model
       {
         headers: { Authorization: `Bearer ${env.HF_TOKEN}` },
         method: 'POST',
-        body: audioData,
+        body: bodyData,
       }
     );
 
@@ -118,9 +125,12 @@ export class AIOrchestrator {
 
   private async getTimestamps(audioData: Buffer | Blob): Promise<any> {
     const formData = new FormData();
-    const blob = audioData instanceof Buffer 
-      ? new Blob([audioData], { type: 'audio/mpeg' }) 
-      : audioData;
+    let blob: Blob;
+    if (audioData instanceof Buffer) {
+      blob = new Blob([new Uint8Array(audioData)], { type: 'audio/mpeg' });
+    } else {
+      blob = audioData as Blob;
+    }
       
     formData.append('file', blob, 'audio.mp3');
     formData.append('model', 'whisper-large-v3');
