@@ -91,9 +91,9 @@ export class AIOrchestrator {
       };
     } catch (error: any) {
       console.error('Processing error:', error);
-      await supabase
+      await (supabase as any)
         .from('projects')
-        .update({ status: 'failed' })
+        .update({ status: 'error' })
         .eq('id', project.id);
       throw error;
     }
