@@ -62,8 +62,7 @@ export async function updateSession(request: NextRequest) {
   // Protect routes
   if (
     !user &&
-    (request.nextUrl.pathname.startsWith('/dashboard') ||
-      request.nextUrl.pathname.startsWith('/editor'))
+    request.nextUrl.pathname.startsWith('/dashboard')
   ) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
