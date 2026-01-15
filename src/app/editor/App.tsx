@@ -261,18 +261,30 @@ function App() {
     
     setIsSavingProject(true);
     try {
+      const projectName = state.fileName || getActiveAesthetic()?.name || 'Untitled Project';
+
       const projectState: ProjectState = {
-        title: getActiveAesthetic()?.name || 'Untitled Project',
-        background_url: state.selectedMedia?.url || undefined,
-        lyrics_json: state.words,
-        activeTab: state.activeTab || 'editor',
-        selectedMedia: state.selectedMedia,
-        audioFile: state.audioFile,
-        audioDuration: state.audioDuration,
+        project_name: projectName,
+        song_title: state.fileName || undefined,
+        audio_duration: state.audioDuration,
+        clip_range: state.clipRange,
+        sections: state.sections,
         words: state.words,
+        videos: state.videos,
+        photos: state.photos,
         font: state.font,
         color: state.color,
-        animationStyle: state.animationStyle
+        animation_style: state.animationStyle,
+
+        // Backwards-compatible fields
+        title: projectName,
+        background_url: state.selectedMedia?.url || undefined,
+        lyrics_json: state.words,
+
+        // UI-only fields
+        activeTab: state.activeTab || 'editor',
+        selectedMedia: state.selectedMedia,
+        audioFile: state.audioFile
       };
 
       const result = await projectPersistenceService.saveProject(projectState, currentProjectId);
@@ -313,29 +325,62 @@ function App() {
       if (result.success && result.project) {
         const project = result.project;
         
-        // Convert project data back to app state
-        const loadedWords = (project.lyrics_json as any[]) || [];
-        
-        setState(prev => ({
-          ...prev,
-          currentView: 'WORKSPACE',
-          activeAestheticId: projectId, // Use projectId as aestheticId for consistency
-          selectedMedia: project.background_url ? {
-            id: generateId(),
-            url: project.background_url,
-            thumbnail: project.background_url, // Use the same URL for thumbnail
-            type: 'video' as const
-          } : null,
-          words: loadedWords,
-          font: prev.font,
-          color: prev.color,
-          animationStyle: prev.animationStyle
-        }));
+        const loadedWords = ((project.words as any[]) ?? (project.lyrics_json as any[]) ?? []) as any[];
+        const loadedSections = ((project.sections as any[]) ?? []) as any[];
+        const loadedVideos = ((project.videos as any[]) ?? []) as any[];
+        const loadedPhotos = ((project.photos as any[]) ?? []) as any[];
+
+        setState(prev => {
+          const name = project.project_name || project.title || 'Untitled Project';
+          const description = project.song_title ? `Song: ${project.song_title}` : 'Loaded project';
+          const thumbnail =
+            project.background_url ||
+            (loadedVideos[0] && (loadedVideos[0].thumbnail || loadedVideos[0].url)) ||
+            (loadedPhotos[0] && (loadedPhotos[0].thumbnail || loadedPhotos[0].url)) ||
+            '/placeholder.jpg';
+
+          const aesthetics = prev.aesthetics.some(a => a.id === projectId)
+            ? prev.aesthetics.map(a => (a.id === projectId ? { ...a, name, description, thumbnail } : a))
+            : [...prev.aesthetics, { id: projectId, name, description, thumbnail, theme: prev.theme }];
+
+          const selectedMedia = project.background_url
+            ? ({
+                id: generateId(),
+                url: project.background_url,
+                thumbnail: project.background_url,
+                type: 'video' as const
+              } satisfies MediaAsset)
+            : (loadedVideos[0] || loadedPhotos[0] || null);
+
+          const clipRange =
+            Array.isArray(project.clip_range) && project.clip_range.length === 2
+              ? ([Number(project.clip_range[0]), Number(project.clip_range[1])] as [number, number])
+              : prev.clipRange;
+
+          return {
+            ...prev,
+            currentView: 'WORKSPACE',
+            aesthetics,
+            activeAestheticId: projectId,
+            selectedMedia,
+            fileName: project.song_title || prev.fileName,
+            audioDuration: project.audio_duration ?? prev.audioDuration,
+            clipRange,
+            sections: loadedSections,
+            words: loadedWords,
+            videos: loadedVideos,
+            photos: loadedPhotos,
+            font: project.font || prev.font,
+            color: project.color || prev.color,
+            animationStyle: project.animation_style || prev.animationStyle,
+            activeTab: 'editor'
+          };
+        });
 
         // Update project persistence state
         setCurrentProjectId(projectId);
         setIsProjectSaved(true);
-        setLastSaveTime(new Date(project.last_edited));
+        setLastSaveTime(new Date(project.updated_at || project.last_edited || project.created_at));
 
         console.log('Project loaded successfully');
       } else {

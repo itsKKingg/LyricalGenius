@@ -91,32 +91,95 @@ export interface Database {
         Row: {
           id: string
           user_id: string
+
+          project_name: string
+          song_title: string | null
+          artist_name: string | null
+          audio_file_url: string | null
+          audio_duration: number | null
+          clip_range: number[] | null
+          sections: Json | null
+          words: Json | null
+          videos: Json | null
+          photos: Json | null
+          aesthetic_id: string | null
+          font: string | null
+          color: string | null
+          animation_style: string | null
+
           title: string
           background_url: string | null
           audio_url: string | null
           lyrics_json: Json | null
-          last_edited: string
+
+          video_url: string | null
+          status: string | null
+
           created_at: string
+          updated_at: string
+          last_edited: string
         }
         Insert: {
           id?: string
           user_id: string
+
+          project_name?: string
+          song_title?: string | null
+          artist_name?: string | null
+          audio_file_url?: string | null
+          audio_duration?: number | null
+          clip_range?: number[] | null
+          sections?: Json | null
+          words?: Json | null
+          videos?: Json | null
+          photos?: Json | null
+          aesthetic_id?: string | null
+          font?: string | null
+          color?: string | null
+          animation_style?: string | null
+
           title?: string
           background_url?: string | null
           audio_url?: string | null
           lyrics_json?: Json | null
-          last_edited?: string
+
+          video_url?: string | null
+          status?: string | null
+
           created_at?: string
+          updated_at?: string
+          last_edited?: string
         }
         Update: {
           id?: string
           user_id?: string
+
+          project_name?: string
+          song_title?: string | null
+          artist_name?: string | null
+          audio_file_url?: string | null
+          audio_duration?: number | null
+          clip_range?: number[] | null
+          sections?: Json | null
+          words?: Json | null
+          videos?: Json | null
+          photos?: Json | null
+          aesthetic_id?: string | null
+          font?: string | null
+          color?: string | null
+          animation_style?: string | null
+
           title?: string
           background_url?: string | null
           audio_url?: string | null
           lyrics_json?: Json | null
-          last_edited?: string
+
+          video_url?: string | null
+          status?: string | null
+
           created_at?: string
+          updated_at?: string
+          last_edited?: string
         }
       }
       aesthetics: {
