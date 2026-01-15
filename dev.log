@@ -1,0 +1,219 @@
+npm warn Unknown env config "python". This will stop working in the next major version of npm.
+
+> project@0.1.0 dev
+> next dev
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/engine/bun.lock as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/engine/project/package-lock.json
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.16.58.203:3000
+- Environments: .env
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 1152ms
+○ Compiling /auth/auth-code-error ...
+ GET /auth/auth-code-error 200 in 6.6s (compile: 6.0s, proxy.ts: 220ms, render: 366ms)
+ GET /auth/error 200 in 806ms (compile: 721ms, proxy.ts: 17ms, render: 67ms)
+ GET /auth/callback 307 in 1422ms (compile: 1395ms, proxy.ts: 7ms, render: 19ms)
+⨯ ./project/src/app/auth/auth-code-error/page.tsx:4:1
+Module not found: Can't resolve './AuthCodeErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthCodeErrorContent[39m [36mfrom[39m [32m"./AuthCodeErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthCodeErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./project/src/app/auth/auth-code-error/page.tsx:4:1
+Module not found: Can't resolve './AuthCodeErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthCodeErrorContent[39m [36mfrom[39m [32m"./AuthCodeErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthCodeErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./project/src/app/auth/auth-code-error/page.tsx:4:1
+Module not found: Can't resolve './AuthCodeErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthCodeErrorContent[39m [36mfrom[39m [32m"./AuthCodeErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthCodeErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./project/src/app/auth/auth-code-error/page.tsx:4:1
+Module not found: Can't resolve './AuthCodeErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthCodeErrorContent[39m [36mfrom[39m [32m"./AuthCodeErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthCodeErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/auth-code-error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/auth-code-error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 151ms
+⨯ ./project/src/app/auth/error/page.tsx:4:1
+Module not found: Can't resolve './AuthErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthErrorContent[39m [36mfrom[39m [32m"./AuthErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./project/src/app/auth/error/page.tsx:4:1
+Module not found: Can't resolve './AuthErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthErrorContent[39m [36mfrom[39m [32m"./AuthErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./project/src/app/auth/error/page.tsx:4:1
+Module not found: Can't resolve './AuthErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthErrorContent[39m [36mfrom[39m [32m"./AuthErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./project/src/app/auth/error/page.tsx:4:1
+Module not found: Can't resolve './AuthErrorContent'
+[0m [90m 2 |[39m
+ [90m 3 |[39m [36mimport[39m { [33mSuspense[39m } [36mfrom[39m [32m"react"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33mAuthErrorContent[39m [36mfrom[39m [32m"./AuthErrorContent"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAuthErrorPage[39m() {
+ [90m 7 |[39m   [36mreturn[39m ([0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./project/src/app/auth/error/page.tsx [Client Component Browser]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./project/src/app/auth/error/page.tsx [Client Component SSR]
+    ./project/src/app/auth/error/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 130ms
+ GET /auth/auth-code-error 200 in 516ms (compile: 162ms, proxy.ts: 13ms, render: 341ms)

@@ -5,7 +5,6 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  // if "next" is in search params, use it as the redirection URL
   const next = searchParams.get('next') ?? '/editor'
 
   if (code) {
@@ -13,9 +12,21 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`)
+    } else {
+      // Redirect to auth-code-error with error details
+      const errorParams = new URLSearchParams({
+        error: error.message || 'auth_failed',
+        error_description: error.message || 'Authentication failed'
+      })
+      return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams}`)
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  // Handle missing code or other errors
+  const errorParams = new URLSearchParams({
+    error: 'missing_auth_code',
+    error_description: 'No authentication code was provided in the callback'
+  })
+  
+  return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams}`)
 }
