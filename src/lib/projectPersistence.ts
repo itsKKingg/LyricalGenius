@@ -6,18 +6,31 @@ export type EditorProjectInsert = Database['public']['Tables']['editor_projects'
 export type EditorProjectUpdate = Database['public']['Tables']['editor_projects']['Update'];
 
 export interface ProjectState {
-  title: string;
-  background_url?: string;
-  audio_url?: string;
-  lyrics_json: any[];
-  activeTab: 'editor' | 'pexels' | 'pinterest';
-  selectedMedia?: any;
-  audioFile?: File | null;
-  audioDuration?: number;
+  project_name: string;
+  song_title?: string;
+  artist_name?: string;
+  audio_file_url?: string;
+  audio_duration?: number;
+  clip_range?: [number, number];
+  sections?: any[];
   words?: any[];
+  videos?: any[];
+  photos?: any[];
+  aesthetic_id?: string | null;
   font?: string;
   color?: string;
-  animationStyle?: string;
+  animation_style?: string;
+
+  // Backwards-compatible fields (older saved projects / older UI)
+  title?: string;
+  background_url?: string;
+  audio_url?: string;
+  lyrics_json?: any[];
+
+  // UI-only fields (not persisted directly)
+  activeTab?: 'editor' | 'pexels' | 'pinterest';
+  selectedMedia?: any;
+  audioFile?: File | null;
 }
 
 export class ProjectPersistenceService {
@@ -31,12 +44,51 @@ export class ProjectPersistenceService {
     return ProjectPersistenceService.instance;
   }
 
-  /**
-   * Get current user ID (mock for demo - replace with real auth)
-   */
   private async getCurrentUserId(): Promise<string> {
-    // TODO: Replace with actual auth user ID from Supabase Auth
-    return 'demo-user-id';
+    const { data, error } = await supabase.auth.getUser();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data.user) {
+      throw new Error('User not authenticated');
+    }
+
+    return data.user.id;
+  }
+
+  private buildProjectData(userId: string, projectState: ProjectState): EditorProjectInsert {
+    const now = new Date().toISOString();
+    const projectName = projectState.project_name || projectState.title || 'Untitled Project';
+    const words = projectState.words ?? projectState.lyrics_json ?? [];
+
+    return {
+      user_id: userId,
+      project_name: projectName,
+      title: projectName,
+
+      song_title: projectState.song_title,
+      artist_name: projectState.artist_name,
+      audio_file_url: projectState.audio_file_url,
+      audio_duration: projectState.audio_duration ?? null,
+      clip_range: projectState.clip_range ? [...projectState.clip_range] : null,
+      sections: projectState.sections ?? [],
+      words,
+      videos: projectState.videos ?? [],
+      photos: projectState.photos ?? [],
+      aesthetic_id: projectState.aesthetic_id ?? null,
+      font: projectState.font ?? null,
+      color: projectState.color ?? null,
+      animation_style: projectState.animation_style ?? null,
+
+      background_url: projectState.background_url,
+      audio_url: projectState.audio_url ?? projectState.audio_file_url,
+      lyrics_json: words,
+
+      updated_at: now,
+      last_edited: now
+    };
   }
 
   /**
@@ -59,14 +111,7 @@ export class ProjectPersistenceService {
       return new Promise((resolve) => {
         this.saveTimeout = setTimeout(async () => {
           try {
-            const projectData: EditorProjectInsert = {
-              user_id: userId,
-              title: projectState.title || 'Untitled Project',
-              background_url: projectState.background_url,
-              audio_url: projectState.audio_url,
-              lyrics_json: projectState.lyrics_json || [],
-              last_edited: new Date().toISOString()
-            };
+            const projectData = this.buildProjectData(userId, projectState);
 
             let result;
             
@@ -123,14 +168,7 @@ export class ProjectPersistenceService {
     try {
       const userId = await this.getCurrentUserId();
       
-      const projectData: EditorProjectInsert = {
-        user_id: userId,
-        title: projectState.title || 'Untitled Project',
-        background_url: projectState.background_url,
-        audio_url: projectState.audio_url,
-        lyrics_json: projectState.lyrics_json || [],
-        last_edited: new Date().toISOString()
-      };
+      const projectData = this.buildProjectData(userId, projectState);
 
       let result;
       
@@ -175,7 +213,7 @@ export class ProjectPersistenceService {
         .from('editor_projects')
         .select('*')
         .eq('user_id', userId)
-        .order('last_edited', { ascending: false });
+        .order('updated_at', { ascending: false });
 
       if (error) {
         console.error('Error loading projects:', error);

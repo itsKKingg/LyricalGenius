@@ -128,80 +128,94 @@ export const LoadProjectModal: React.FC<LoadProjectModalProps> = ({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {projects.map((project) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -2 }}
-                  className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all cursor-pointer group"
-                  onClick={() => onLoadProject(project.id)}
-                >
-                  {/* Project Thumbnail */}
-                  <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
-                    {project.background_url ? (
-                      <img
-                        src={project.background_url}
-                        alt={project.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div className={`${project.background_url ? 'hidden' : 'flex'} items-center justify-center w-full h-full`}>
-                      <Play size={24} className="text-white/70" />
-                    </div>
-                    
-                    {/* Delete button */}
-                    <button
-                      onClick={(e) => handleDeleteProject(project.id, e)}
-                      className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+              {projects.map((project) => {
+                const projectName = project.project_name || project.title || 'Untitled Project';
+                const previewUrl =
+                  project.background_url ||
+                  (Array.isArray(project.photos) && (project.photos as any[])[0]?.url) ||
+                  (Array.isArray(project.videos) && (project.videos as any[])[0]?.url) ||
+                  null;
 
-                  {/* Project Info */}
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                      {truncateText(project.title, 30)}
-                    </h3>
-                    
-                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-                      <Calendar size={14} />
-                      <span>{formatDate(project.last_edited)}</span>
-                    </div>
+                const lastEdited = project.updated_at || project.last_edited || project.created_at;
+                const wordCount = Array.isArray(project.words)
+                  ? project.words.length
+                  : Array.isArray(project.lyrics_json)
+                    ? project.lyrics_json.length
+                    : 0;
 
-                    {/* Lyrics preview */}
-                    {project.lyrics_json && Array.isArray(project.lyrics_json) && project.lyrics_json.length > 0 && (
-                      <div className="text-xs text-gray-400 dark:text-gray-500 mb-2">
-                        {project.lyrics_json.length} lyric words
+                return (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -2 }}
+                    className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all cursor-pointer group"
+                    onClick={() => onLoadProject(project.id)}
+                  >
+                    {/* Project Thumbnail */}
+                    <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+                      {previewUrl ? (
+                        <img
+                          src={previewUrl}
+                          alt={projectName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`${previewUrl ? 'hidden' : 'flex'} items-center justify-center w-full h-full`}>
+                        <Play size={24} className="text-white/70" />
                       </div>
-                    )}
 
-                    {/* Status indicator */}
-                    <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>
-                        Saved
-                      </span>
-                      
+                      {/* Delete button */}
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onLoadProject(project.id);
-                        }}
-                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                        onClick={(e) => handleDeleteProject(project.id, e)}
+                        className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                       >
-                        Load →
+                        <Trash2 size={14} />
                       </button>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Project Info */}
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                        {truncateText(projectName, 30)}
+                      </h3>
+
+                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <Calendar size={14} />
+                        <span>{formatDate(lastEdited)}</span>
+                      </div>
+
+                      {/* Lyrics preview */}
+                      {wordCount > 0 && (
+                        <div className="text-xs text-gray-400 dark:text-gray-500 mb-2">{wordCount} lyric words</div>
+                      )}
+
+                      {/* Status indicator */}
+                      <div className="flex items-center justify-between">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>
+                          Saved
+                        </span>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onLoadProject(project.id);
+                          }}
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                        >
+                          Load →
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
