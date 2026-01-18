@@ -24,6 +24,10 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 262.1 83.3% 57.8%;
     --radius: 0.5rem;
+    --sidebar: 210 40% 96%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --content-bg: 0 0% 100%;
+    --content-foreground: 222.2 84% 4.9%;
   }
 
   .dark {
@@ -46,6 +50,10 @@
     --border: 215 25% 15%; /* Darker border */
     --input: 215 25% 15%;
     --ring: 226 100% 50%; /* indigo-500 ring */
+    --sidebar: 222.2 84% 4.9%; /* Dark sidebar background */
+    --sidebar-foreground: 210 40% 98%;
+    --content-bg: 222.2 84% 3.9%; /* Main content dark background */
+    --content-foreground: 210 40% 98%;
   }
 }
 
@@ -53,8 +61,35 @@
   * {
     border-color: hsl(var(--border));
   }
+  
+  html {
+    color-scheme: light dark;
+  }
+  
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    min-height: 100vh;
+  }
+  
+  /* Main content area styling */
+  .main-content {
+    background-color: hsl(var(--content-bg));
+    color: hsl(var(--content-foreground));
+  }
+  
+  /* Ensure all text respects theme */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    color: inherit;
+  }
+  
+  /* Icon color fixes for dark mode */
+  svg {
+    color: inherit;
+  }
+  
+  /* Fix for lucide icons */
+  .lucide {
+    color: currentColor;
   }
 }
