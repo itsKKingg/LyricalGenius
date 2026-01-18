@@ -16,12 +16,15 @@ import { AppState, Section, LyricWord, ViewType, Aesthetic, MediaAsset } from '.
 import { generateId } from './utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projectPersistenceService, ProjectState } from '../../lib/projectPersistence';
+import { useTheme } from '../../contexts/ThemeContext';
 
 function App() {
+  const { theme, toggleTheme } = useTheme();
+  
   const [state, setState] = useState<AppState>({
     currentView: 'HOME',
     currentModal: 'NONE',
-    theme: 'light', // Default theme
+    theme: 'light', // Keep for backwards compatibility but not used
     activeAestheticId: null,
     aesthetics: [],
     activeTab: 'editor',
@@ -109,10 +112,7 @@ function App() {
     }
   };
 
-  // Theme management
-  const toggleTheme = () => {
-    setState(prev => ({ ...prev, theme: prev.theme === 'light' ? 'dark' : 'light' }));
-  };
+  // Theme management - now handled by context
 
   // Navigation handlers
   const handleNavigate = (view: ViewType, aestheticId?: string) => {
@@ -536,7 +536,7 @@ function App() {
             );
 
       case 'SETTINGS':
-        return <SettingsView currentTheme={state.theme} onToggleTheme={toggleTheme} />;
+        return <SettingsView />;
 
       default:
         return <div>View not found</div>;
@@ -568,7 +568,7 @@ function App() {
                   className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   aria-label="Toggle theme"
                 >
-                  {state.theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                  {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                 </button>
 
                 {/* User Menu */}
@@ -581,7 +581,7 @@ function App() {
           )}
 
           {/* Animated Content Container */}
-          <div className="flex-1 relative overflow-hidden">
+          <div className="flex-1 relative overflow-hidden main-content">
             <AnimatePresence mode="wait">
               <motion.div
                 key={state.currentView + (state.currentView === 'WORKSPACE' ? state.activeTab : '')}

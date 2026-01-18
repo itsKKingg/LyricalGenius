@@ -1,13 +1,11 @@
 import React from 'react';
 import { Moon, Sun, Monitor, Bell, Shield, Keyboard, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../../contexts/ThemeContext';
 
-interface SettingsViewProps {
-  currentTheme: 'light' | 'dark';
-  onToggleTheme: () => void;
-}
-
-export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onToggleTheme }) => {
+export const SettingsView: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
+  
   return (
     <motion.div 
       initial={{ opacity: 0, x: 20 }} 
@@ -34,14 +32,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onTogg
               </div>
               <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                 <button 
-                  onClick={onToggleTheme}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${currentTheme === 'light' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                  onClick={toggleTheme}
+                  className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${theme === 'light' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                 >
                   <Sun size={14} /> Light
                 </button>
                 <button 
-                  onClick={onToggleTheme}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${currentTheme === 'dark' ? 'bg-[#0B0D10] text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
+                  onClick={toggleTheme}
+                  className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${theme === 'dark' ? 'bg-[#0B0D10] text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'}`}
                 >
                   <Moon size={14} /> Dark
                 </button>
